@@ -1,0 +1,27 @@
+#ifndef SHADER_H
+#define SHADER_H
+
+#include <string>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+class Shader {
+public:
+    GLuint programID;
+
+    Shader(const std::string& vertexPath, const std::string& fragmentPath);
+    void Use();
+    void SetMat4(const std::string& name, const glm::mat4& value);
+    void SetVec3(const std::string& name, const glm::vec3& value);
+    void SetFloat(const std::string& name, const int value);
+    void SetInt(const std::string& name, const int value);
+
+private:
+    GLuint LoadShader(const std::string& path, GLenum shaderType);
+    void CheckShaderCompilation(GLuint shader, const std::string& shaderType);
+    void CheckProgramLinking();
+};
+
+
+#endif

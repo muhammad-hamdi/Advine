@@ -1,0 +1,17 @@
+vendor
+├── glad/
+│   ├── glad.h
+│   ├── KHR
+│   │   └── khrplatform.h
+│   └── src
+│       └── glad.c
+├── GLFW/
+│   ├── glfw3.h
+│   ├── glfw3native.h
+│   └── lib
+│       └── libglfw3.a/ .lib
+├── glm/
+├── json.hpp
+├── stb_image.h
+├── stb_image_write.h
+└── tiny_gltf.h
