@@ -2,13 +2,17 @@
 #include "Renderer.h"
 #include <iostream>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 Game::Game(int windowWidth, int windowHeight, const char* windowTitle) 
-    : windowWidth(windowWidth), windowHeight(windowHeight), window(nullptr), scene(nullptr), camera(nullptr) {
+    : windowWidth(windowWidth), windowHeight(windowHeight), window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
     Initialize();
 }
 
 Game::~Game() {
+    delete uiManager;
     delete scene;
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -40,6 +44,8 @@ void Game::Initialize() {
 
     scene = new Scene();
     SetupScene();
+
+    uiManager = new UI(window);
 }
 
 void Game::SetupScene() {
@@ -113,6 +119,12 @@ void Game::Update(float deltaTime) {
 }
 
 void Game::Render() {
+    glClearColor(0.45f, 0.55f, 0.60f, 1.00f); // Clear screen color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Renderer::RenderScene(*scene, *scene->GetActiveCamera());
+    
+    uiManager->StartFrame();
+    uiManager->ShowGameObjectEditor(scene);
+    uiManager->Render();
+
 }

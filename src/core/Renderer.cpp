@@ -12,11 +12,11 @@ void Renderer::RenderGameObject(GameObject* object, const Camera& camera, glm::m
     if (!object) return;
 
     // If the object should be rendered in world space, we pass an identity matrix as the parent transform
-    glm::mat4 globalTransform = parentTransform * object->transform;
+    glm::mat4 globalTransform = parentTransform * object->GetTransform();
 
     // Check if the object is intended to be rendered in world space (this flag can be added to GameObject)
     if (object->isWorldSpace) {
-        globalTransform = object->transform;  // Ignore parent transform for world space objects
+        globalTransform = object->GetTransform();  // Ignore parent transform for world space objects
     }
 
     // Render the current object
