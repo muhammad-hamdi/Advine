@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CXX=g++
-CXXFLAGS="-std=c++17 -Wall -Wextra -O2"
+CXXFLAGS="-g -std=c++17 -Wall -Wextra -O2"
 LDFLAGS="-ldl -lGL"
 
 SRC_DIR="src"
@@ -22,6 +22,7 @@ IMGUI_SOURCES="
     vendor/imgui/imgui_widgets.cpp
     vendor/imgui/backends/imgui_impl_glfw.cpp
     vendor/imgui/backends/imgui_impl_opengl3.cpp
+    vendor/imgui/misc/cpp/imgui_stdlib.cpp
 "
 
 mkdir -p $BUILD_DIR

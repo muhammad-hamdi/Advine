@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "Texture.h"
+#include "core/AssetManager.h"
 
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -109,9 +110,53 @@ void Model::LoadGLTF(const std::string& path) {
                 indices.push_back(index);
             }
 
-            // TODO: Load material and textures properly
-            Material* mat = new Material(nullptr, nullptr); // Placeholder
+            int materialIndex = primitive.material;
+            Material* mat = nullptr;
+
+            if (materialIndex >= 0 && materialIndex < gltfModel.materials.size()) {
+                const tinygltf::Material& gltfMaterial = gltfModel.materials[materialIndex];
+
+                Texture* diffuseTexture = nullptr;
+
+                // Load diffuse texture if available
+                if (gltfMaterial.values.find("baseColorTexture") != gltfMaterial.values.end()) {
+                    const auto& texInfo = gltfMaterial.values.at("baseColorTexture");
+                    int textureIndex = texInfo.TextureIndex();
+                    if (textureIndex >= 0 && textureIndex < gltfModel.textures.size()) {
+                        const tinygltf::Texture& gltfTexture = gltfModel.textures[textureIndex];
+                        int imageIndex = gltfTexture.source;
+
+                        if (imageIndex >= 0 && imageIndex < gltfModel.images.size()) {
+                            const tinygltf::Image& image = gltfModel.images[imageIndex];
+                            std::string texName = image.uri;
+
+                            // Load texture via AssetManager
+                            diffuseTexture = AssetManager::LoadTexture(texName, "assets/models/" + texName);
+                        }
+                    }
+                }
+
+                // Load shader from AssetManager or default
+                Shader* shader = AssetManager::GetShader("default");
+                if (!shader) {
+                    shader = AssetManager::LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
+                }
+
+                mat = new Material(gltfMaterial.name, shader, diffuseTexture);
+                AssetManager::AddMaterial(gltfMaterial.name, mat);
+                printf("INFO: Custom Material Loaded\n");
+            } else {
+                // Fallback to default material
+                mat = AssetManager::GetDefaultMaterial();
+                printf("INFO: Default Material Loaded\n");
+            }
             meshes.push_back(Mesh(vertices, indices, mat));
         }
+    }
+}
+
+void Model::SetMaterial(Material* mat) {
+    for (Mesh& mesh : meshes) {
+        mesh.SetMaterial(mat);
     }
 }

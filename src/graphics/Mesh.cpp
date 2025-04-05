@@ -6,10 +6,14 @@ Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned int> inds, Material* 
 }
 
 void Mesh::Draw() {
-    material->shader->Use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void Mesh::SetMaterial(Material *mat)
+{
+    material = mat;
 }
 
 void Mesh::SetupMesh() {

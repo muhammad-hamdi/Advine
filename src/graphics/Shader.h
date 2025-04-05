@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include <string>
+#include <map>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -12,12 +13,13 @@
 class Shader {
 public:
     GLuint programID;
+    std::map<std::string, GLint> locations;
 
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
     void Use();
     void SetMat4(const std::string& name, const glm::mat4& value);
     void SetVec3(const std::string& name, const glm::vec3& value);
-    void SetFloat(const std::string& name, const int value);
+    void SetFloat(const std::string& name, const float value);
     void SetInt(const std::string& name, const int value);
 
 private:

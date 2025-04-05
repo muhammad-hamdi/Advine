@@ -5,6 +5,8 @@
 #include "graphics/Material.h"
 #include "graphics/Shader.h"
 
+#include "time.h"
+
 int GameObject::objectCount = 0;
 
 GameObject::GameObject() {
@@ -16,12 +18,13 @@ void GameObject::SetModel(Model* m) {
     model = m;
 }
 
+void GameObject::SetMaterial(Material *material)
+{
+    globalMaterial = material;
+}
+
 void GameObject::Update(float deltaTime)
 {
-    // glm::vec3 movement = glm::vec3(0.1f * deltaTime, 0.0f, 0.0f); // Move along X-axis for example
-
-    // Apply movement to the existing transformation matrix by modifying the translation part
-    // transform = glm::translate(transform, movement);
 }
 
 void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
@@ -30,20 +33,19 @@ void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
     glm::mat4 modelMatrix = globalTransform; // Use the combined global transform
 
     for (Mesh& mesh : model->GetMeshes()) {
-        Material* material = mesh.GetMaterial();
-        Shader* shader = material->GetShader();
-        shader->Use();
+        Material* material = GetMaterialForMesh(&mesh);
+        if(!material) continue;
 
+        Shader* shader = material->GetShader();
+        material->Bind();
+        shader->SetFloat("time", time(0));
         // Set common uniforms
         shader->SetMat4("model", modelMatrix);
-        shader->SetMat4("view", camera.GetViewMatrix()); // Get view matrix from camera
-        shader->SetMat4("projection", camera.GetProjectionMatrix()); // Get projection matrix from camera
-
-        // Bind material (textures, etc.)
-        material->Bind();
-
+        shader->SetMat4("view", camera.GetViewMatrix());
+        shader->SetMat4("projection", camera.GetProjectionMatrix());
         // Draw mesh
         mesh.Draw();
+        material->UnBind();
     }
 }
 
@@ -83,7 +85,26 @@ glm::vec3 GameObject::GetScale() const
     return scale;
 }
 
+void GameObject::AddMaterialOverride(Mesh *mesh, Material *material)
+{
+    materialOverrides[mesh] = material;
+}
+
+Material *GameObject::GetMaterialForMesh(Mesh *mesh)
+{
+    if (materialOverrides.find(mesh) != materialOverrides.end()) {
+        return materialOverrides[mesh];
+    }
+    if (globalMaterial) return globalMaterial;
+    return mesh->GetMaterial(); // default fallback
+}
+
 std::string GameObject::GetName() const
 {
     return name;
+}
+
+std::vector<GameObject *> GameObject::GetChildren() const
+{
+    return children;
 }

@@ -2,7 +2,8 @@
 #include "Shader.h"
 #include "Texture.h"
 
-void Material::Bind() {
+void Material::Bind()
+{
     if (!shader) return;
 
     shader->Use();
@@ -17,5 +18,21 @@ void Material::Bind() {
         shader->SetInt("texture_specular", 1); // Assumes uniform name in shader
     }
 
-    // You can set more material-related uniforms here if needed
+    // set more material-related uniforms here if needed
+}
+
+void Material::UnBind() {
+    if (!shader) return;
+
+    shader->Use();
+
+    if (diffuseTexture) {
+        diffuseTexture->UnBind(0);
+        shader->SetInt("texture_diffuse", -1);
+    }
+
+    if (specularTexture) {
+        specularTexture->UnBind(1);
+        shader->SetInt("texture_specular", -1);
+    }
 }

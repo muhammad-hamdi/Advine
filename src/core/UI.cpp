@@ -1,5 +1,6 @@
 #include "UI.h"
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
@@ -30,35 +31,82 @@ void UI::ShowGameObjectEditor(Scene *scene)
     // List all game objects in the scene
     std::vector<GameObject*> gameObjects = scene->GetGameObjects();
 
-    // TODOD: instead of showing them directly with all their transoforms, only show the name and clicking it should open another menu with all game object details
+    ImGui::Begin("Scene Tree");
+    if(ImGui::Button("Deselect")) {
+        selectedObject = nullptr;
+    }
+    if(ImGui::Button("New Object")) {
+        printf("New Object\n");
+    }
+    for (auto& obj : gameObjects) {
+        DrawObjectTree(obj);
+    }
+    ImGui::End();
 
-    if (ImGui::Begin("Game Object Editor")) {
-        for (auto& obj : gameObjects) {
-            if (ImGui::TreeNode(obj->GetName().c_str())) {
-                // Show the properties of the selected game object
-                // Display the position
-                glm::vec3 position = obj->GetPosition();
-                if (ImGui::DragFloat3("Position", &position[0])) {
-                    obj->SetPosition(position);
-                }
-
-                // Display the rotation
-                glm::vec3 rotation = glm::degrees(glm::eulerAngles(obj->GetRotation()));  // Convert quat to Euler angles
-                if (ImGui::DragFloat3("Rotation", &rotation[0])) {
-                    obj->SetRotation(glm::quat(glm::radians(rotation)));
-                }
-
-                // Display the scale
-                glm::vec3 scale = obj->GetScale();
-                if (ImGui::DragFloat3("Scale", &scale[0])) {
-                    obj->SetScale(scale);
-                }
-
-                ImGui::TreePop();
+    ImGui::Begin("Properties");
+    if(selectedObject != nullptr) {
+        ImGui::Text("Name");
+        ImGui::SameLine();
+        ImGui::InputText("##NameInput", &selectedObject->name);
+        ImGui::Checkbox("World Transofrm", &selectedObject->isWorldSpace);
+        if (ImGui::TreeNode("Transform")) {
+            // Show the properties of the selected game selectedObjectect
+            // Display the position
+            glm::vec3 position = selectedObject->GetPosition();
+            if (ImGui::DragFloat3("Position", &position[0])) {
+                selectedObject->SetPosition(position);
             }
+
+            // Display the rotation
+            glm::vec3 rotation = glm::degrees(glm::eulerAngles(selectedObject->GetRotation()));  // Convert quat to Euler angles
+            if (ImGui::DragFloat3("Rotation", &rotation[0])) {
+                selectedObject->SetRotation(glm::quat(glm::radians(rotation)));
+            }
+
+            // Display the scale
+            glm::vec3 scale = selectedObject->GetScale();
+            if (ImGui::DragFloat3("Scale", &scale[0])) {
+                selectedObject->SetScale(scale);
+            }
+
+            ImGui::TreePop();
         }
 
-        ImGui::End();
+        if (ImGui::TreeNode("Material")) {
+            if(selectedObject->model) {
+                for(auto mesh: selectedObject->model->GetMeshes()) {
+                    auto mat = selectedObject->GetMaterialForMesh(&mesh);
+                    ImGui::Text("Name:");
+                    ImGui::SameLine();
+                    ImGui::Text(mat->name.c_str());
+                }
+            }
+            ImGui::TreePop();
+        }
+    } else {
+        ImGui::Text("Select a GameObject");
+    }
+
+    ImGui::End();
+}
+
+void UI::DrawObjectTree(GameObject* n)
+{
+    int flags = ImGuiTreeNodeFlags_SpanFullWidth;
+    if(n->GetChildren().size() == 0) {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
+    if(n == selectedObject) {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
+    if (ImGui::TreeNodeEx(n->GetName().c_str(), flags)) {
+        if (ImGui::IsItemClicked())
+        {
+            selectedObject = n;
+        }
+        for (auto child: n->GetChildren())
+            DrawObjectTree(child);
+        ImGui::TreePop();
     }
 }
 

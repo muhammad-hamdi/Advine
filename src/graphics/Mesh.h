@@ -20,6 +20,7 @@ public:
     unsigned int GetVAO() const { return VAO; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     Material* GetMaterial() const { return material; }
+    void SetMaterial(Material* mat);
 
 private:
     GLuint VAO, VBO, EBO;

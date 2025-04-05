@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Renderer.h"
+#include "AssetManager.h"
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -42,10 +43,12 @@ void Game::Initialize() {
 
     glEnable(GL_DEPTH_TEST);
 
+    AssetManager::Init();
+
+    uiManager = new UI(window);
     scene = new Scene();
     SetupScene();
 
-    uiManager = new UI(window);
 }
 
 void Game::SetupScene() {
@@ -54,17 +57,8 @@ void Game::SetupScene() {
     scene->AddCamera("MainCamera", camera);
     scene->SetActiveCamera("MainCamera");
 
-    // Initialize some game objects, load models, etc.
-    Model* model = new Model();
-    model->LoadGLTF("assets/models/monkey.gltf");
-
-    Shader* shader = new Shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
-
-    for (Mesh& mesh : model->GetMeshes()) {
-        if (mesh.GetMaterial()) {
-            mesh.GetMaterial()->SetShader(shader);
-        }
-    }
+    Model* model = AssetManager::LoadModel("monkey", "assets/models/monkey.gltf");
+    Model* modelTextured = AssetManager::LoadModel("monkey_textured", "assets/models/monkey_textured.gltf");
 
     // Create GameObject(s)
     GameObject* obj1 = new GameObject();
@@ -74,11 +68,17 @@ void Game::SetupScene() {
     obj1->SetRotation(glm::quat(glm::radians(glm::vec3(-45.0, 0.0, 0))));
 
     GameObject* obj2 = new GameObject();
-    obj2->SetModel(model);  // Set the same model or a different one
+    obj2->SetModel(modelTextured);  // Set the same model or a different one
     obj2->SetPosition(glm::vec3(2.0f, 0.0f, -5.0f));
+
+    GameObject* obj3 = new GameObject();
+    obj3->SetModel(modelTextured);
+    obj3->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
+    obj3->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
 
     scene->AddGameObject(obj1);
     scene->AddGameObject(obj2);
+    scene->AddGameObject(obj3);
 
     // More objects can be added as needed.
 }

@@ -70,11 +70,44 @@ void Shader::Use() {
 }
 
 void Shader::SetMat4(const std::string& name, const glm::mat4& value) {
-    GLint loc = glGetUniformLocation(programID, name.c_str());
+    GLint loc;
+    if(locations.find(name) != locations.end()) {
+        loc = locations[name];
+    } else {
+        loc = glGetUniformLocation(programID, name.c_str());
+    }
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::SetInt(const std::string& name, const int value) {
-    GLint loc = glGetUniformLocation(programID, name.c_str());
+void Shader::SetVec3(const std::string &name, const glm::vec3 &value)
+{
+    GLint loc;
+    if(locations.find(name) != locations.end()) {
+        loc = locations[name];
+    } else {
+        loc = glGetUniformLocation(programID, name.c_str());
+    }
+    glUniform3fv(loc, 1, glm::value_ptr(value));
+}
+
+void Shader::SetFloat(const std::string &name, const float value)
+{
+    GLint loc;
+    if(locations.find(name) != locations.end()) {
+        loc = locations[name];
+    } else {
+        loc = glGetUniformLocation(programID, name.c_str());
+    }
+    glUniform1f(loc, value);
+}
+
+void Shader::SetInt(const std::string &name, const int value)
+{
+    GLint loc;
+    if(locations.find(name) != locations.end()) {
+        loc = locations[name];
+    } else {
+        loc = glGetUniformLocation(programID, name.c_str());
+    }
     glUniform1i(loc, value);
 }

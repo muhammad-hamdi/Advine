@@ -14,6 +14,7 @@ public:
     Texture(const std::string& imagePath, const std::string& type = "diffuse");
 
     void Bind(GLuint unit = 0) const;
+    void UnBind(GLuint unit = 0) const;
 
 private:
     void LoadFromFile(const std::string& path);

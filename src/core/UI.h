@@ -8,8 +8,12 @@ class UI {
     UI(GLFWwindow* window);
     ~UI();
 
-    void ShowGameObjectEditor(Scene* scene);
+    GameObject* selectedObject = nullptr;
+
     void ShowFPS(float fps);
     void StartFrame();
     void Render();
+
+    void ShowGameObjectEditor(Scene* scene);
+    void DrawObjectTree(GameObject* n);
 };
