@@ -30,26 +30,27 @@ void UI::ShowGameObjectEditor(Scene *scene)
     // List all game objects in the scene
     std::vector<GameObject*> gameObjects = scene->GetGameObjects();
 
+    // TODOD: instead of showing them directly with all their transoforms, only show the name and clicking it should open another menu with all game object details
+
     if (ImGui::Begin("Game Object Editor")) {
         for (auto& obj : gameObjects) {
             if (ImGui::TreeNode(obj->GetName().c_str())) {
                 // Show the properties of the selected game object
-                
                 // Display the position
                 glm::vec3 position = obj->GetPosition();
-                if (ImGui::SliderFloat3("Position", &position[0], -100.0, 100.0)) {
+                if (ImGui::DragFloat3("Position", &position[0])) {
                     obj->SetPosition(position);
                 }
 
                 // Display the rotation
                 glm::vec3 rotation = glm::degrees(glm::eulerAngles(obj->GetRotation()));  // Convert quat to Euler angles
-                if (ImGui::SliderFloat3("Rotation", &rotation[0], -360.0, 360.0)) {
+                if (ImGui::DragFloat3("Rotation", &rotation[0])) {
                     obj->SetRotation(glm::quat(glm::radians(rotation)));
                 }
 
                 // Display the scale
                 glm::vec3 scale = obj->GetScale();
-                if (ImGui::SliderFloat3("Scale", &scale[0], 0.1, 20.0)) {
+                if (ImGui::DragFloat3("Scale", &scale[0])) {
                     obj->SetScale(scale);
                 }
 
@@ -59,6 +60,11 @@ void UI::ShowGameObjectEditor(Scene *scene)
 
         ImGui::End();
     }
+}
+
+void UI::ShowFPS(float fps)
+{
+    ImGui::Text("%f", fps);
 }
 
 void UI::StartFrame()

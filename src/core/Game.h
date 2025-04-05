@@ -28,4 +28,6 @@ private:
 
     int windowWidth;
     int windowHeight;
+
+    float fps = 0;
 };

@@ -9,6 +9,7 @@ class UI {
     ~UI();
 
     void ShowGameObjectEditor(Scene* scene);
+    void ShowFPS(float fps);
     void StartFrame();
     void Render();
 };

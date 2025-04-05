@@ -115,6 +115,7 @@ void Game::ProcessInput(float deltaTime) {
 }
 
 void Game::Update(float deltaTime) {
+    fps = 1/deltaTime;
     scene->Update(deltaTime);
 }
 
@@ -124,6 +125,7 @@ void Game::Render() {
     Renderer::RenderScene(*scene, *scene->GetActiveCamera());
     
     uiManager->StartFrame();
+    uiManager->ShowFPS(fps);
     uiManager->ShowGameObjectEditor(scene);
     uiManager->Render();
 
