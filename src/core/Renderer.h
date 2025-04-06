@@ -1,8 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "Scene.h"
-#include "Camera.h"
+#include "core/Scene.h"
+#include "core/Camera.h"
 
 class Renderer {
 public:

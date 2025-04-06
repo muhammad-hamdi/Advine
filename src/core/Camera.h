@@ -6,7 +6,7 @@
 
 class Camera {
 public:
-    Camera(float fov, float aspectRatio, float nearPlane, float farPlane);
+    Camera(float fov, float aspectRatio, float nearPlane, float farPlane, int viewWidth, int viewHeight);
 
     glm::mat4 GetViewMatrix() const;
     glm::mat4 GetProjectionMatrix() const;
@@ -17,12 +17,17 @@ public:
     void SetTarget(const glm::vec3& target);
     void SetUp(const glm::vec3& up);
 
+    void Update(float deltaTime);
+
 private:
     glm::vec3 position;
     glm::vec3 target;
     glm::vec3 up;
 
     glm::mat4 projectionMatrix;
+
+    float yaw = -90.0f;
+    float pitch = 0;
 };
 
 #endif

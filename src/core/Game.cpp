@@ -1,11 +1,15 @@
 #include "Game.h"
-#include "Renderer.h"
-#include "AssetManager.h"
-#include <iostream>
+
+#include "core/Input.h"
+#include "core/Renderer.h"
+#include "core/AssetManager.h"
+
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+
+#include <iostream>
 
 Game::Game(int windowWidth, int windowHeight, const char* windowTitle) 
     : windowWidth(windowWidth), windowHeight(windowHeight), window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
@@ -44,6 +48,7 @@ void Game::Initialize() {
     glEnable(GL_DEPTH_TEST);
 
     AssetManager::Init();
+    Input::Init(window);
 
     uiManager = new UI(window);
     scene = new Scene();
@@ -52,7 +57,7 @@ void Game::Initialize() {
 
 void Game::SetupScene() {
     // Setup camera (perspective, position, etc.)
-    camera = new Camera(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
+    camera = new Camera(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f, windowWidth, windowHeight);
     scene->AddCamera("MainCamera", camera);
     scene->SetActiveCamera("MainCamera");
 
@@ -112,7 +117,15 @@ void Game::ProcessInput(float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+    Input::Update();
     // Other input handling (camera movement, etc.) can be added here.
+    if (Input::IsMousePressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        Input::SetMouseCaptured(true); // Capture the mouse
+    }
+    if(Input::IsKeyPressed(GLFW_KEY_Q)) {
+        Input::SetMouseCaptured(false);
+    }
+    scene->GetActiveCamera()->Update(deltaTime);
 }
 
 void Game::Update(float deltaTime) {

@@ -1,10 +1,11 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
+#include "core/Camera.h"
+#include "graphics/Model.h"
 
 #include <glm/glm.hpp>
+
 #include <unordered_map>
-#include "graphics/Model.h"
-#include "core/Camera.h"
 
 class GameObject {
 public:

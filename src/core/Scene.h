@@ -1,11 +1,12 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "core/Camera.h"
+#include "game/GameObject.h"
+
+#include <map>
 #include <vector>
 #include <memory>
-#include <map>
-#include "game/GameObject.h"
-#include "Camera.h"
 
 class Scene {
 public:

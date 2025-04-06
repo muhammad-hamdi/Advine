@@ -1,5 +1,6 @@
-#include "Scene.h"
-#include "Renderer.h"
+#include "core/Scene.h"
+#include "core/Renderer.h"
+
 #include <algorithm>
 #include <iostream>
 
