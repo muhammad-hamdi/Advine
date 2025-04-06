@@ -1,12 +1,15 @@
 #include "UI.h"
 #include <algorithm>
 #include <string>
+
+#include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include "Game.h"
 
-UI::UI(GLFWwindow *window)
+UI::UI(GLFWwindow *window): window(window)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -69,7 +72,12 @@ void UI::ShowGameObjectEditor(Scene *scene)
     // List all game objects in the scene
     std::vector<GameObject*> gameObjects = scene->GetGameObjects();
 
-    ImGui::Begin("Scene Tree");
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(imguiPanelWidth, windowHeight));
+    ImGui::Begin("Left Panel", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     if(ImGui::Button("Deselect")) {
         selectedObject = nullptr;
     }
@@ -82,13 +90,15 @@ void UI::ShowGameObjectEditor(Scene *scene)
     }
     ImGui::End();
 
-    ImGui::Begin("Properties");
+    ImGui::SetNextWindowPos(ImVec2(windowWidth - imguiPanelWidth, 0));
+    ImGui::SetNextWindowSize(ImVec2(imguiPanelWidth, windowHeight));
+    ImGui::Begin("Right Panel", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     if(selectedObject != nullptr) {
         ImGui::Text("Name");
         ImGui::SameLine();
         ImGui::InputText("##NameInput", &selectedObject->name);
         ImGui::Checkbox("World Transofrm", &selectedObject->isWorldSpace);
-        if (ImGui::TreeNode("Transform")) {
+        if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
             // Show the properties of the selected game selectedObjectect
             // Display the position
             glm::vec3 position = selectedObject->GetPosition();
@@ -111,7 +121,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Material")) {
+        if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
             if(selectedObject->model) {
                 for(auto mesh: selectedObject->model->GetMeshes()) {
                     auto mat = selectedObject->GetMaterialForMesh(&mesh);

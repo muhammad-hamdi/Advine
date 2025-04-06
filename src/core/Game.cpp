@@ -45,6 +45,11 @@ void Game::Initialize() {
         exit(EXIT_FAILURE);
     }
 
+    glfwSetFramebufferSizeCallback(window, ResizeCallback);
+
+    viewportWidth = windowWidth - 2*UI::imguiPanelWidth;
+
+    glViewport(UI::imguiPanelWidth, 0, viewportWidth, windowHeight);
     glEnable(GL_DEPTH_TEST);
 
     AssetManager::Init();
@@ -57,7 +62,7 @@ void Game::Initialize() {
 
 void Game::SetupScene() {
     // Setup camera (perspective, position, etc.)
-    camera = new Camera(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f, windowWidth, windowHeight);
+    camera = new Camera(45.0f, (float)viewportWidth / windowHeight, 0.1f, 100.0f);
     scene->AddCamera("MainCamera", camera);
     scene->SetActiveCamera("MainCamera");
 
@@ -69,24 +74,27 @@ void Game::SetupScene() {
     GameObject* obj1 = new GameObject();
     obj1->SetModel(box);  // Set the loaded model
     // obj1->SetScale(glm::vec3(1.0, 2.0, 1.0));
-    obj1->SetPosition(glm::vec3(-2.0f, 0.0f, -5.0f));
-    obj1->SetRotation(glm::quat(glm::radians(glm::vec3(-45.0, 0.0, 0))));
+    obj1->SetPosition(glm::vec3(-3.0f, 0.0f, -5.0f));
     obj1->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
 
     GameObject* obj2 = new GameObject();
     obj2->SetModel(modelTextured);  // Set the same model or a different one
-    obj2->SetPosition(glm::vec3(2.0f, 0.0f, -5.0f));
+    obj2->SetPosition(glm::vec3(3.0f, 0.0f, -5.0f));
 
     GameObject* obj3 = new GameObject();
     obj3->SetModel(modelTextured);
     obj3->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
     obj3->SetMaterial(AssetManager::GetMaterial("scroll_tex"));
 
+    GameObject* ground = new GameObject();
+    ground->SetModel(box);
+    ground->SetPosition(glm::vec3(0.0f, -5.0f, 0.0f));
+    ground->SetScale(glm::vec3(10.0, 0.2, 10.0));
+
     scene->AddGameObject(obj1);
     scene->AddGameObject(obj2);
     scene->AddGameObject(obj3);
-
-    // More objects can be added as needed.
+    scene->AddGameObject(ground);
 }
 
 void Game::AddObjectToScene(GameObject* object) {
@@ -125,12 +133,24 @@ void Game::ProcessInput(float deltaTime) {
     if(Input::IsKeyPressed(GLFW_KEY_Q)) {
         Input::SetMouseCaptured(false);
     }
-    scene->GetActiveCamera()->Update(deltaTime);
+}
+
+void Game::ResizeCallback(GLFWwindow *window, int width, int height)
+{
+    // TODO: remove this padding when we define some debug macro
+    glViewport(UI::imguiPanelWidth, 0, width - 2*UI::imguiPanelWidth, height);
 }
 
 void Game::Update(float deltaTime) {
     fps = 1/deltaTime;
     scene->Update(deltaTime);
+    scene->GetActiveCamera()->Update(deltaTime);
+
+    // TODO: move to another method
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    viewportWidth = windowWidth - 2*UI::imguiPanelWidth;
+    camera->SetProjectionMatrix(45.0f, (float)viewportWidth/windowHeight, 0.1f, 100.0f);
 }
 
 void Game::Render() {
@@ -139,8 +159,6 @@ void Game::Render() {
     Renderer::RenderScene(*scene, *scene->GetActiveCamera());
     
     uiManager->StartFrame();
-    uiManager->ShowFPS(fps);
     uiManager->ShowGameObjectEditor(scene);
     uiManager->Render();
-
 }

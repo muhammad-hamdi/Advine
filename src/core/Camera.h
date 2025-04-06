@@ -6,7 +6,7 @@
 
 class Camera {
 public:
-    Camera(float fov, float aspectRatio, float nearPlane, float farPlane, int viewWidth, int viewHeight);
+    Camera(float fov, float aspectRatio, float nearPlane, float farPlane);
 
     glm::mat4 GetViewMatrix() const;
     glm::mat4 GetProjectionMatrix() const;
@@ -21,7 +21,7 @@ public:
 
 private:
     glm::vec3 position;
-    glm::vec3 target;
+    glm::vec3 front;
     glm::vec3 up;
 
     glm::mat4 projectionMatrix;

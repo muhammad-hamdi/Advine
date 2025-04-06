@@ -29,5 +29,9 @@ private:
     int windowWidth;
     int windowHeight;
 
+    int viewportWidth;
+
+    static void ResizeCallback(GLFWwindow* window, int width, int height);
+
     float fps = 0;
 };

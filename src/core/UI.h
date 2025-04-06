@@ -4,10 +4,11 @@
 struct GLFWwindow;
 
 class UI {
-    public:
+public:
     UI(GLFWwindow* window);
     ~UI();
 
+    static const int imguiPanelWidth = 300;
     GameObject* selectedObject = nullptr;
 
     void ShowFPS(float fps);
@@ -16,4 +17,7 @@ class UI {
 
     void ShowGameObjectEditor(Scene* scene);
     void DrawObjectTree(GameObject* n, int id);
+
+private:
+    GLFWwindow* window;
 };

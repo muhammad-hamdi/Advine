@@ -4,17 +4,17 @@
 
 #include <iostream>
 
-Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane, int viewWidth, int viewHeight) {
+Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane) {
     projectionMatrix = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 
     // Default values
     position = glm::vec3(0.0f, 0.0f, 3.0f);
-    target = glm::vec3(0.0f, 0.0f, -1.0f);
+    front = glm::vec3(0.0f, 0.0f, -1.0f);
     up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
 glm::mat4 Camera::GetViewMatrix() const {
-    return glm::lookAt(position, position + target, up);
+    return glm::lookAt(position, position + front, up);
 }
 
 glm::mat4 Camera::GetProjectionMatrix() const {
@@ -31,7 +31,7 @@ void Camera::SetPosition(const glm::vec3& pos) {
 }
 
 void Camera::SetTarget(const glm::vec3& t) {
-    target = t;
+    front = t;
 }
 
 void Camera::SetUp(const glm::vec3& u) {
@@ -51,15 +51,15 @@ void Camera::Update(float deltaTime)
         direction.y = sin(glm::radians(pitch));
         direction.z = sin(glm::radians(yaw))*cos(glm::radians(pitch));
         direction = glm::normalize(direction);
-        target = direction;
+        front = direction;
     }
 
-    glm::vec3 right = glm::normalize(glm::cross(target, up));
+    glm::vec3 right = glm::normalize(glm::cross(front, up));
     if (Input::IsKeyPressed(GLFW_KEY_W)) {
-        position += target * 0.1f;
+        position += front * 0.1f;
     }
     if (Input::IsKeyPressed(GLFW_KEY_S)) {
-        position -= target * 0.1f;
+        position -= front * 0.1f;
     }
 
     if (Input::IsKeyPressed(GLFW_KEY_A)) {
