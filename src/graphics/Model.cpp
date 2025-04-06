@@ -139,6 +139,7 @@ void Model::LoadGLTF(const std::string& path) {
                 // Load shader from AssetManager or default
                 Shader* shader = AssetManager::GetShader("default");
                 if (!shader) {
+                    printf("WARNING: Failed To Load Default Shader\n");
                     shader = AssetManager::LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
                 }
 

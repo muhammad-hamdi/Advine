@@ -1,4 +1,6 @@
 #include "UI.h"
+#include <algorithm>
+#include <string>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <backends/imgui_impl_glfw.h>
@@ -25,6 +27,42 @@ UI::~UI()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
+bool findStringIC(const std::string & strHaystack, const std::string & strNeedle)
+{
+  auto it = std::search(
+    strHaystack.begin(), strHaystack.end(),
+    strNeedle.begin(),   strNeedle.end(),
+    [](unsigned char ch1, unsigned char ch2) { return std::toupper(ch1) == std::toupper(ch2); }
+  );
+  return (it != strHaystack.end() );
+}
+
+void DrawMaterialEditor(Material* material) {
+    for (const auto& uniform : material->GetUniformMetadata()) {
+        const std::string& name = uniform.name;
+
+        // Only handle a few types for now
+        if (uniform.type == GL_FLOAT) {
+            float value = material->customUniforms[name].first.f;
+            if (ImGui::DragFloat(name.c_str(), &value)) {
+                material->SetCustomUniform(name, value, GL_FLOAT);
+            }
+        }
+        else if (uniform.type == GL_FLOAT_VEC3) {
+            glm::vec3 value = material->customUniforms[name].first.v3;
+            if(findStringIC(name, "color")) {
+                if (ImGui::ColorEdit3(name.c_str(), glm::value_ptr(value))) {
+                    material->SetCustomUniform(name, value, GL_FLOAT_VEC3);
+                }
+            } else {
+                if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value))) {
+                    material->SetCustomUniform(name, value, GL_FLOAT_VEC3);
+                }
+            }
+        }
+        // Add other types as needed
+    }
+}
 
 void UI::ShowGameObjectEditor(Scene *scene)
 {
@@ -38,8 +76,9 @@ void UI::ShowGameObjectEditor(Scene *scene)
     if(ImGui::Button("New Object")) {
         printf("New Object\n");
     }
+    int id = 0;
     for (auto& obj : gameObjects) {
-        DrawObjectTree(obj);
+        DrawObjectTree(obj, id++);
     }
     ImGui::End();
 
@@ -79,6 +118,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
                     ImGui::Text("Name:");
                     ImGui::SameLine();
                     ImGui::Text(mat->name.c_str());
+                    DrawMaterialEditor(mat);
                 }
             }
             ImGui::TreePop();
@@ -90,7 +130,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
     ImGui::End();
 }
 
-void UI::DrawObjectTree(GameObject* n)
+void UI::DrawObjectTree(GameObject* n, int id)
 {
     int flags = ImGuiTreeNodeFlags_SpanFullWidth;
     if(n->GetChildren().size() == 0) {
@@ -99,13 +139,13 @@ void UI::DrawObjectTree(GameObject* n)
     if(n == selectedObject) {
         flags |= ImGuiTreeNodeFlags_Selected;
     }
-    if (ImGui::TreeNodeEx(n->GetName().c_str(), flags)) {
+    if (ImGui::TreeNodeEx((n->GetName() + "###node_" + std::to_string(id)).c_str(), flags)) {
         if (ImGui::IsItemClicked())
         {
             selectedObject = n;
         }
         for (auto child: n->GetChildren())
-            DrawObjectTree(child);
+            DrawObjectTree(child, id++);
         ImGui::TreePop();
     }
 }

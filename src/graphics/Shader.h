@@ -3,12 +3,17 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/matrix_decompose.hpp>
+
+struct UniformInfo {
+    std::string name;
+    GLenum type;
+    GLint location;
+};
 
 class Shader {
 public:
@@ -22,10 +27,13 @@ public:
     void SetFloat(const std::string& name, const float value);
     void SetInt(const std::string& name, const int value);
 
+    std::vector<UniformInfo> GetCustomUniforms();
+
 private:
     GLuint LoadShader(const std::string& path, GLenum shaderType);
     void CheckShaderCompilation(GLuint shader, const std::string& shaderType);
     void CheckProgramLinking();
+    bool IsStandardUniform(const std::string& name) const;
 };
 
 

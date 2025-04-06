@@ -22,8 +22,10 @@ Model* AssetManager::LoadModel(const std::string& name, const std::string& path)
 
 Shader* AssetManager::LoadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath) {
     auto it = shaders.find(name);
-    if (it != shaders.end()) return it->second.get();
-
+    if (it != shaders.end()) {
+        printf("INFO: Loaded Default Shader");
+        return it->second.get();
+    }
     auto shader = std::make_unique<Shader>(vertexPath.c_str(), fragmentPath.c_str());
     shaders[name] = std::move(shader);
     return shaders[name].get();
@@ -64,6 +66,7 @@ Model* AssetManager::GetModel(const std::string& name) {
 }
 
 Shader* AssetManager::GetShader(const std::string& name) {
+    printf("INFO: Loading Shader {%s}\n", name.c_str());
     auto it = shaders.find(name);
     return (it != shaders.end()) ? it->second.get() : nullptr;
 }

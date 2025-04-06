@@ -48,7 +48,6 @@ void Game::Initialize() {
     uiManager = new UI(window);
     scene = new Scene();
     SetupScene();
-
 }
 
 void Game::SetupScene() {
@@ -57,15 +56,17 @@ void Game::SetupScene() {
     scene->AddCamera("MainCamera", camera);
     scene->SetActiveCamera("MainCamera");
 
+    Model* box = AssetManager::LoadModel("box", "assets/models/cube.gltf");
     Model* model = AssetManager::LoadModel("monkey", "assets/models/monkey.gltf");
     Model* modelTextured = AssetManager::LoadModel("monkey_textured", "assets/models/monkey_textured.gltf");
 
     // Create GameObject(s)
     GameObject* obj1 = new GameObject();
-    obj1->SetModel(model);  // Set the loaded model
+    obj1->SetModel(box);  // Set the loaded model
     // obj1->SetScale(glm::vec3(1.0, 2.0, 1.0));
     obj1->SetPosition(glm::vec3(-2.0f, 0.0f, -5.0f));
     obj1->SetRotation(glm::quat(glm::radians(glm::vec3(-45.0, 0.0, 0))));
+    obj1->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
 
     GameObject* obj2 = new GameObject();
     obj2->SetModel(modelTextured);  // Set the same model or a different one
@@ -74,7 +75,7 @@ void Game::SetupScene() {
     GameObject* obj3 = new GameObject();
     obj3->SetModel(modelTextured);
     obj3->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
-    obj3->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
+    obj3->SetMaterial(AssetManager::GetMaterial("scroll_tex"));
 
     scene->AddGameObject(obj1);
     scene->AddGameObject(obj2);

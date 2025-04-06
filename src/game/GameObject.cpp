@@ -5,8 +5,6 @@
 #include "graphics/Material.h"
 #include "graphics/Shader.h"
 
-#include "time.h"
-
 int GameObject::objectCount = 0;
 
 GameObject::GameObject() {
@@ -26,8 +24,9 @@ void GameObject::SetMaterial(Material *material)
 void GameObject::Update(float deltaTime)
 {
 }
-
+static int counter = 0;
 void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
+    counter++;
     if (!model) return;
 
     glm::mat4 modelMatrix = globalTransform; // Use the combined global transform
@@ -38,7 +37,7 @@ void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
 
         Shader* shader = material->GetShader();
         material->Bind();
-        shader->SetFloat("time", time(0));
+        shader->SetFloat("time", (float)counter);
         // Set common uniforms
         shader->SetMat4("model", modelMatrix);
         shader->SetMat4("view", camera.GetViewMatrix());

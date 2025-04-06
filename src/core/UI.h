@@ -15,5 +15,5 @@ class UI {
     void Render();
 
     void ShowGameObjectEditor(Scene* scene);
-    void DrawObjectTree(GameObject* n);
+    void DrawObjectTree(GameObject* n, int id);
 };

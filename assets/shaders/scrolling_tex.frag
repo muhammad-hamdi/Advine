@@ -17,7 +17,7 @@ out vec4 FragColor;
 void main()
 {
     // Ambient
-    float ambientStrength = clamp(sin(time), 0, 1);
+    float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
 
     // Diffuse
@@ -27,7 +27,7 @@ void main()
     vec3 diffuse = diff * lightColor;
 
     // Texture or fallback color
-    vec3 texColor = texture(texture_diffuse, TexCoord).rgb;
+    vec3 texColor = texture(texture_diffuse, vec2(TexCoord.x + 0.001*time, TexCoord.y)).rgb;
     if (length(texColor) <= 0.01) texColor = objectColor;
 
     vec3 result = (ambient + diffuse) * texColor;
