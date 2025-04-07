@@ -48,11 +48,12 @@ void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
     }
 }
 
-void GameObject::SetPosition(const glm::vec3& newPosition) {
+void GameObject::SetPosition(const glm::vec3 &newPosition)
+{
     position = newPosition;
 }
 
-void GameObject::SetRotation(const glm::quat& newRotation) {
+void GameObject::SetRotation(const glm::vec3& newRotation) {
     rotation = newRotation;
 }
 
@@ -62,11 +63,23 @@ void GameObject::SetScale(const glm::vec3& newScale) {
 
 glm::mat4 GameObject::GetTransform() const {
     // Compute the transform matrix by combining position, rotation, and scale
-    glm::mat4 transform = glm::mat4(1.0f);
-    transform = glm::translate(transform, position);  // Apply translation (position)
-    transform *= glm::mat4_cast(rotation);  // Apply rotation (using quaternion)
-    transform = glm::scale(transform, scale);  // Apply scaling
-    return transform;
+    // glm::mat4 transform = glm::mat4(1.0f);
+    // transform = glm::translate(transform, position);  // Apply translation (position)
+    // transform *= glm::mat4_cast(rotation);  // Apply rotation (using quaternion)
+    // transform = glm::scale(transform, scale);  // Apply scaling
+
+    const glm::mat4 transformX = glm::rotate(glm::mat4(1.0f),
+                    glm::radians(rotation.x),
+                    glm::vec3(1.0f, 0.0f, 0.0f));
+    const glm::mat4 transformY = glm::rotate(glm::mat4(1.0f),
+                glm::radians(rotation.y),
+                glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 transformZ = glm::rotate(glm::mat4(1.0f),
+                glm::radians(rotation.z),
+                glm::vec3(0.0f, 0.0f, 1.0f));
+
+    const glm::mat4 roationMatrix = transformY * transformX * transformZ;
+    return glm::translate(glm::mat4(1.0f), position) * roationMatrix * glm::scale(glm::mat4(1.0f), scale);
 }
 
 glm::vec3 GameObject::GetPosition() const
@@ -74,7 +87,7 @@ glm::vec3 GameObject::GetPosition() const
     return position;
 }
 
-glm::quat GameObject::GetRotation() const
+glm::vec3 GameObject::GetRotation() const
 {
     return rotation;
 }

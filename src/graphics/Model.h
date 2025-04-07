@@ -2,7 +2,7 @@
 #define MODEL_H
 
 #include <vector>
-#include "Mesh.h"
+#include "graphics/Mesh.h"
 
 class Model {
 public:

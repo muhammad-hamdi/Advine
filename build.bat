@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 set CXX=cl
-set CXXFLAGS=/Zi /std:c++17 /W4 /O2 /MDd
+set CXXFLAGS=/Zi /std:c++17 /W4 /O2 /MD
 set LDFLAGS=opengl32.lib user32.lib gdi32.lib shell32.lib
 set BUILD_DIR=build
 set EXECUTABLE=game.exe
@@ -38,6 +38,7 @@ set GLAD_SRC=%VENDOR_DIR%\glad\src\glad.c
 
 echo Compiling...
 pushd %BUILD_DIR%
+echo "%CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:../%BUILD_DIR%\%EXECUTABLE% /link %LDFLAGS%"
 %CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:../%BUILD_DIR%\%EXECUTABLE% /link %LDFLAGS%
 popd
 

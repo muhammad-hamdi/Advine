@@ -113,9 +113,9 @@ void UI::ShowGameObjectEditor(Scene *scene)
             }
 
             // Display the rotation
-            glm::vec3 rotation = glm::degrees(glm::eulerAngles(selectedObject->GetRotation()));  // Convert quat to Euler angles
+            glm::vec3 rotation = selectedObject->GetRotation();  // Convert quat to Euler angles
             if (ImGui::DragFloat3("Rotation", &rotation[0])) {
-                selectedObject->SetRotation(glm::quat(glm::radians(rotation)));
+                selectedObject->SetRotation(rotation);
             }
 
             // Display the scale

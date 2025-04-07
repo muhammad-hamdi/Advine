@@ -13,7 +13,7 @@ public:
 
     std::string name;
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
     std::vector<GameObject*> children;
@@ -43,11 +43,11 @@ public:
     Material* GetMaterialForMesh(Mesh* mesh);
 
     void SetPosition(const glm::vec3& position);
-    void SetRotation(const glm::quat& rotation);
+    void SetRotation(const glm::vec3& rotation);
     void SetScale(const glm::vec3& scale);
     glm::mat4 GetTransform() const;
     glm::vec3 GetPosition() const;
-    glm::quat GetRotation() const;
+    glm::vec3 GetRotation() const;
     glm::vec3 GetScale() const;
 
 };
