@@ -51,6 +51,12 @@ void DrawMaterialEditor(Material* material) {
                 material->SetCustomUniform(name, value, GL_FLOAT);
             }
         }
+        else if (uniform.type == GL_INT) {
+            int value = material->customUniforms[name].first.i;
+            if (ImGui::DragInt(name.c_str(), &value)) {
+                material->SetCustomUniform(name, value, GL_INT);
+            }
+        }
         else if (uniform.type == GL_FLOAT_VEC3) {
             glm::vec3 value = material->customUniforms[name].first.v3;
             if(findStringIC(name, "color")) {

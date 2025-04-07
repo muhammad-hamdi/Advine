@@ -14,6 +14,7 @@ public:
     void SetProjectionMatrix(float fov, float aspectRatio, float nearPlane, float farPlane);
 
     void SetPosition(const glm::vec3& pos);
+    glm::vec3 GetPosition();
     void SetTarget(const glm::vec3& target);
     void SetUp(const glm::vec3& up);
 

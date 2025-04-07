@@ -70,12 +70,15 @@ void Game::SetupScene() {
     Model* model = AssetManager::LoadModel("monkey", "assets/models/monkey.gltf");
     Model* modelTextured = AssetManager::LoadModel("monkey_textured", "assets/models/monkey_textured.gltf");
 
+    box->SetMaterial(AssetManager::GetDefaultMaterial());
+
+    AssetManager::GetDefaultMaterial()->SetCustomUniform("objectColor", UniformValue(glm::vec3(1.0)), GL_FLOAT_VEC3);
+
     // Create GameObject(s)
     GameObject* obj1 = new GameObject();
     obj1->SetModel(box);  // Set the loaded model
     // obj1->SetScale(glm::vec3(1.0, 2.0, 1.0));
     obj1->SetPosition(glm::vec3(-3.0f, 0.0f, -5.0f));
-    obj1->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
 
     GameObject* obj2 = new GameObject();
     obj2->SetModel(modelTextured);  // Set the same model or a different one
@@ -84,7 +87,7 @@ void Game::SetupScene() {
     GameObject* obj3 = new GameObject();
     obj3->SetModel(modelTextured);
     obj3->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
-    obj3->SetMaterial(AssetManager::GetMaterial("scroll_tex"));
+    obj3->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
 
     GameObject* ground = new GameObject();
     ground->SetModel(box);
@@ -151,6 +154,7 @@ void Game::Update(float deltaTime) {
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
     viewportWidth = windowWidth - 2*UI::imguiPanelWidth;
     camera->SetProjectionMatrix(45.0f, (float)viewportWidth/windowHeight, 0.1f, 100.0f);
+    AssetManager::GetDefaultMaterial()->SetCustomUniform("viewPos", UniformValue(camera->GetPosition()), GL_FLOAT_VEC3);
 }
 
 void Game::Render() {

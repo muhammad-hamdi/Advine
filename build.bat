@@ -2,17 +2,17 @@
 setlocal enabledelayedexpansion
 
 set CXX=cl
-set CXXFLAGS=/Zi /std:c++17 /W4 /O2
+set CXXFLAGS=/Zi /std:c++17 /W4 /O2 /MDd
 set LDFLAGS=opengl32.lib user32.lib gdi32.lib shell32.lib
 set BUILD_DIR=build
 set EXECUTABLE=game.exe
-set VENDOR_DIR=vendor
+set VENDOR_DIR=../vendor
 
 :: Create build directory if it doesn't exist
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
 :: Include paths
-set INCLUDE_FLAGS=/I"%VENDOR_DIR%" /I"%VENDOR_DIR%\imgui" /I"src"
+set INCLUDE_FLAGS=/I"%VENDOR_DIR%" /I"%VENDOR_DIR%\imgui" /I"../src"
 
 :: GLFW library (assuming pre-built Windows version)
 set GLFW_LIB=%VENDOR_DIR%\GLFW\lib-vc2022\glfw3.lib
@@ -37,7 +37,9 @@ for %%f in (
 set GLAD_SRC=%VENDOR_DIR%\glad\src\glad.c
 
 echo Compiling...
-%CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:%BUILD_DIR%\%EXECUTABLE% /link %LDFLAGS%
+pushd %BUILD_DIR%
+%CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:../%BUILD_DIR%\%EXECUTABLE% /link %LDFLAGS%
+popd
 
 if %errorlevel% equ 0 (
     echo Build successful! Run with %BUILD_DIR%\%EXECUTABLE%

@@ -30,6 +30,11 @@ void Camera::SetPosition(const glm::vec3& pos) {
     position = pos;
 }
 
+glm::vec3 Camera::GetPosition()
+{
+    return position;
+}
+
 void Camera::SetTarget(const glm::vec3& t) {
     front = t;
 }
