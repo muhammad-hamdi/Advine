@@ -65,6 +65,7 @@ void Game::Initialize() {
 }
 
 void Game::SetupScene() {
+#if 0
     // Setup camera (perspective, position, etc.)
     camera = new Camera(45.0f, (float)viewportWidth / windowHeight, 0.1f, 100.0f);
     scene->AddCamera("MainCamera", camera);
@@ -102,6 +103,22 @@ void Game::SetupScene() {
     scene->AddGameObject(obj2);
     scene->AddGameObject(obj3);
     scene->AddGameObject(ground);
+#endif
+
+    Model* loader = new Model();
+
+    Entity* monkeyEntity = loader->LoadAssimp("assets/models/monkey_textured.gltf");
+    monkeyEntity->transform.position = {5, 0, -5};
+    Entity* nanosuitEntity = loader->LoadAssimp("assets/models/nanosuit/nanosuit.obj");
+    nanosuitEntity->transform.position = {-5, 0, -5};
+
+    Entity* cameraEntity = scene->CreateEntity("MainCamera");
+    cameraEntity->transform.position = {0, 0, 0};
+    cameraEntity->AddComponent<CameraComponent>()->isActive = true;
+    scene->SetActiveCamera(cameraEntity);
+
+    scene->AddEntity(monkeyEntity);
+    scene->AddEntity(nanosuitEntity);
 }
 
 void Game::AddObjectToScene(GameObject* object) {
@@ -145,27 +162,24 @@ void Game::ProcessInput(float deltaTime) {
 void Game::ResizeCallback(GLFWwindow *window, int width, int height)
 {
     // TODO: remove this padding when we define some debug macro
+    windowWidth = width;
+    windowHeight = height;
     glViewport(UI::imguiPanelWidth, 0, width - 2*UI::imguiPanelWidth, height);
 }
 
 void Game::Update(float deltaTime) {
     fps = 1/deltaTime;
     scene->Update(deltaTime);
-    scene->GetActiveCamera()->Update(deltaTime);
+    // scene->GetActiveCamera()->Update(deltaTime);
 
     // TODO: move to another method
-    int windowWidth, windowHeight;
-    glfwGetWindowSize(window, &windowWidth, &windowHeight);
     viewportWidth = windowWidth - 2*UI::imguiPanelWidth;
+#if 0
     camera->SetProjectionMatrix(45.0f, (float)viewportWidth/windowHeight, 0.1f, 100.0f);
     AssetManager::GetDefaultMaterial()->SetCustomUniform("viewPos", UniformValue(camera->GetPosition()), GL_FLOAT_VEC3);
-}
+#endif
 
-void Game::Render() {
-    glClearColor(0.45f, 0.55f, 0.60f, 1.00f); // Clear screen color
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Entity* activeCameraEntity = scene->GetActiveCameraEntity();
-    
     if (activeCameraEntity) {
         auto* cam = activeCameraEntity->GetComponent<CameraComponent>();
         glm::mat4 view = cam->GetViewMatrix(
@@ -174,11 +188,14 @@ void Game::Render() {
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
     
-        glm::mat4 projection = cam->GetProjectionMatrix(windowWidth/windowHeight);
+        glm::mat4 projection = cam->GetProjectionMatrix(viewportWidth/windowHeight);
         Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
     }
+}
 
-    Renderer::RenderScene(*scene, *scene->GetActiveCamera());
+void Game::Render() {
+    // Renderer::RenderScene(*scene, *scene->GetActiveCamera());
+    Renderer::RenderScene(*scene);
     
     uiManager->StartFrame();
     uiManager->ShowGameObjectEditor(scene);

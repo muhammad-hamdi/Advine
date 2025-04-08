@@ -94,6 +94,10 @@ void UI::ShowGameObjectEditor(Scene *scene)
     for (auto& obj : gameObjects) {
         DrawObjectTree(obj, id++);
     }
+
+    for (auto& entity : scene->GetEntities()) {
+        DrawSceneGraph(entity, id++);
+    }
     ImGui::End();
 
     ImGui::SetNextWindowPos(ImVec2(windowWidth - imguiPanelWidth, 0));
@@ -162,6 +166,27 @@ void UI::DrawObjectTree(GameObject* n, int id)
         }
         for (auto child: n->GetChildren())
             DrawObjectTree(child, id++);
+        ImGui::TreePop();
+    }
+}
+
+void UI::DrawSceneGraph(Entity *n, int id)
+{
+    int flags = ImGuiTreeNodeFlags_SpanFullWidth;
+    if(n->children.size() == 0) {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
+    if(n == selectedEntity) {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
+    if (ImGui::TreeNodeEx((n->name + "###node_" + std::to_string(id)).c_str(), flags)) {
+        if (ImGui::IsItemClicked())
+        {
+            selectedEntity = n;
+            printf("Position: %f, %f, %f\n", n->GetWorldPosition().x, n->GetWorldPosition().y, n->GetWorldPosition().z);
+        }
+        for (auto child: n->children)
+            DrawSceneGraph(child, id++);
         ImGui::TreePop();
     }
 }

@@ -8,7 +8,8 @@ class Renderer {
 public:
     static void RenderScene(Scene& scene, Camera& camera);
     static void RenderScene(Scene& scene);
-    static void DrawMesh(Mesh* mesh, Material* material, const glm::mat4& modelMatrix);
+    static void RenderEntity(Entity *entity);
+    static void DrawMesh(Mesh *mesh, Material *material, const glm::mat4 &modelMatrix);
 
     static glm::mat4 GetViewMatrix();
     static glm::mat4 GetProjectionMatrix();

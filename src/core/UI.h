@@ -1,5 +1,6 @@
 #pragma once
-#include "Scene.h"
+#include "core/Scene.h"
+#include "core/Entity.h"
 
 struct GLFWwindow;
 
@@ -10,6 +11,7 @@ public:
 
     static const int imguiPanelWidth = 250;
     GameObject* selectedObject = nullptr;
+    Entity* selectedEntity = nullptr;
 
     void ShowFPS(float fps);
     void StartFrame();
@@ -17,6 +19,7 @@ public:
 
     void ShowGameObjectEditor(Scene* scene);
     void DrawObjectTree(GameObject* n, int id);
+    void DrawSceneGraph(Entity* n, int id);
 
 private:
     GLFWwindow* window;

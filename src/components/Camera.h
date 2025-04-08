@@ -1,5 +1,7 @@
 #pragma once
 #include "core/Component.h"
+#include "core/Input.h"
+#include "core/Entity.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,6 +11,10 @@ public:
     float fov = 60.0f;
     float nearPlane = 0.1f;
     float farPlane = 1000.0f;
+
+    float yaw = -90.0f;
+    float pitch = 0;
+
     glm::mat4 projectionMatrix;
 
     bool isActive = false; // helpful if you support multiple cameras
@@ -19,5 +25,31 @@ public:
 
     glm::mat4 GetViewMatrix(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up) const {
         return glm::lookAt(position, position + forward, up);
+    }
+
+    void Update(float deltaTime) override {
+        if(Input::IsMouseCaptured()) {
+            auto mousePos = Input::GetMouseDelta();
+            yaw += mousePos.x*0.1f;
+            pitch -= mousePos.y*0.1f;
+            pitch = glm::clamp(pitch, -89.0f,  89.0f);
+        }
+        owner->transform.eulerRotation = { pitch, yaw, 0 };
+    
+        glm::vec3 front = owner->transform.GetForwardDirection();
+        glm::vec3 right = owner->transform.GetRightDirection();
+        if (Input::IsKeyPressed(GLFW_KEY_W)) {
+            owner->transform.position += front * 0.1f;
+        }
+        if (Input::IsKeyPressed(GLFW_KEY_S)) {
+            owner->transform.position -= front * 0.1f;
+        }
+    
+        if (Input::IsKeyPressed(GLFW_KEY_A)) {
+            owner->transform.position -= right * 0.1f;
+        }
+        if (Input::IsKeyPressed(GLFW_KEY_D)) {
+            owner->transform.position += right * 0.1f;
+        }
     }
 };

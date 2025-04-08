@@ -22,12 +22,14 @@ public:
     void SetActiveCamera(Entity *entity);
     Camera* GetActiveCamera() const;
     Entity* GetActiveCameraEntity() const;
+    Entity* CreateEntity(const std::string& name);
+    void AddEntity(Entity* entity);
 
     void Render(const Camera& camera);
     void Update(float deltaTime);
 
     template<typename T, typename Predicate>
-    Entity* Scene::FindEntityWithComponent(Predicate predicate) {
+    Entity* FindEntityWithComponent(Predicate predicate) {
         for (Entity* entity : entities) {
             T* comp = entity->GetComponent<T>();
             if (comp && predicate(comp)) {

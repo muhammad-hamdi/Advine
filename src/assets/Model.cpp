@@ -174,7 +174,7 @@ Entity *Model::LoadAssimp(const std::string& path) {
 
     if (!scene || !scene->mRootNode) {
         std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
-        return;
+        return nullptr;
     }
 
     std::filesystem::path baseDir = std::filesystem::path(path).parent_path();
@@ -199,18 +199,20 @@ Entity* Model::ProcessNode(aiNode* node, const aiScene* scene, const std::filesy
     entity->name = node->mName.C_Str();
     entity->transform = ConvertTransform(node->mTransformation);
 
-    for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
-        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-
+    if(node->mNumMeshes > 0) {
         MeshRenderer* renderer = entity->AddComponent<MeshRenderer>();
-        renderer->mesh = ProcessMesh(mesh);
-        renderer->material = LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir);
+        for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
+            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+    
+            renderer->meshes.push_back(ProcessMesh(mesh));
+            renderer->materials.push_back(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
+        }
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; ++i) {
         Entity* child = ProcessNode(node->mChildren[i], scene, baseDir);
+        child->parent = entity;
         entity->children.push_back(child);
-        entity->children.back()->parent = entity;
     }
 
     return entity;

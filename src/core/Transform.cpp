@@ -24,9 +24,9 @@ glm::mat4 Transform::GetLocalModelMatrix() const
 
 glm::vec3 Transform::GetForwardDirection() const {
     glm::vec3 direction;
-    direction.x = cos(rotation.y) * cos(rotation.x);
-    direction.y = sin(rotation.x);
-    direction.z = sin(rotation.y) * cos(rotation.x);
+    direction.x = cos(glm::radians(eulerRotation.y)) * cos(glm::radians(eulerRotation.x));
+    direction.y = sin(glm::radians(eulerRotation.x));
+    direction.z = sin(glm::radians(eulerRotation.y)) * cos(glm::radians(eulerRotation.x));
     return glm::normalize(direction);
 }
 

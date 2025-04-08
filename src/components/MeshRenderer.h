@@ -5,6 +5,6 @@
 
 class MeshRenderer : public Component {
 public:
-    Mesh *mesh;
-    Material *material;
+    std::vector<Mesh*> meshes;
+    std::vector<Material*> materials;
 };

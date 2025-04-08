@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 class Transform
@@ -9,7 +10,7 @@ public:
     //Local space information
     glm::vec3 position = { 0.0f, 0.0f, 0.0f };
     glm::vec3 eulerRotation = { 0.0f, 0.0f, 0.0f }; //In degrees
-    glm::quat rotation = { 1.0f, 0.0f, 0.0f, 0.0f };
+    glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
     glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
 
 private:

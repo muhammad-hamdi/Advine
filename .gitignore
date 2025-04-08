@@ -1,3 +1,5 @@
 vendor
 build
 imgui.ini
+*.dll
+.vs/

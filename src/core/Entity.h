@@ -1,10 +1,10 @@
 #pragma once
+#include "core/Transform.h"
+#include "core/Component.h"
+
 #include <vector>
 #include <string>
 #include <memory>
-#include "Transform.h"
-
-class Component; // Forward declaration
 
 class Entity {
 public:
@@ -35,15 +35,9 @@ public:
         return nullptr;
     }
 
-    glm::mat4 GetWorldMatrix() const {
-        if (parent) {
-            return parent->transform.GetLocalModelMatrix() * transform.GetLocalModelMatrix();
-        } else {
-            return transform.GetLocalModelMatrix();
-        }
-    }
+    glm::mat4 GetWorldMatrix() const;
 
-    glm::vec3 GetWorldPosition() const {
-        return glm::vec3(GetWorldMatrix()[3]);
-    }
+    glm::vec3 GetWorldPosition() const;
+
+    void Update(float deltaTime);
 };

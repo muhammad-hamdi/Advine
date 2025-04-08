@@ -41,6 +41,19 @@ Entity *Scene::GetActiveCameraEntity() const
     return activeCameraEntity;
 }
 
+Entity *Scene::CreateEntity(const std::string &name)
+{
+    Entity *entity = new Entity();
+    entity->name = name;
+    entities.push_back(entity);
+    return entity;
+}
+
+void Scene::AddEntity(Entity *entity)
+{
+    entities.push_back(entity);
+}
+
 // Set the active camera by name
 void Scene::SetActiveCamera(const std::string& name) {
     if (cameras.find(name) != cameras.end()) {
@@ -56,10 +69,14 @@ Camera *Scene::GetActiveCamera() const
 void Scene::Update(float deltaTime)
 {
     // Here, we could update GameObjects for things like physics, animation, etc.
-    for (const auto& obj : gameObjects) {
-        // For each GameObject, we can update its state
-        // For example, applying movement, handling input, etc.
-        obj->Update(deltaTime);
+    // for (const auto& obj : gameObjects) {
+    //     // For each GameObject, we can update its state
+    //     // For example, applying movement, handling input, etc.
+    //     obj->Update(deltaTime);
+    // }
+
+    for (const auto& entity : entities) {
+        entity->Update(deltaTime);
     }
 }
 

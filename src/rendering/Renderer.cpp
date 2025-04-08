@@ -2,6 +2,7 @@
 #include "components/MeshRenderer.h"
 
 void Renderer::RenderScene(Scene& scene, Camera& camera) {
+    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto& obj : scene.GetGameObjects()) {
@@ -11,18 +12,25 @@ void Renderer::RenderScene(Scene& scene, Camera& camera) {
 
 void Renderer::RenderScene(Scene &scene)
 {
+    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for(auto& ent : scene.GetEntities()) {
-        MeshRenderer* mr = ent->GetComponent<MeshRenderer>();
-        DrawMesh(mr->mesh, mr->material, ent->GetWorldMatrix());
-
-        for(auto& child : ent->children) {
-            mr = child->GetComponent<MeshRenderer>();
-            DrawMesh(mr->mesh, mr->material, child->GetWorldMatrix());
-        }
+    for(auto& entity : scene.GetEntities()) {
+        RenderEntity(entity);
     }
 }
+
+void Renderer::RenderEntity(Entity *entity) {
+    MeshRenderer* mr = entity->GetComponent<MeshRenderer>();
+    if(mr)
+        for(int i = 0; i < mr->meshes.size(); i++) {
+            DrawMesh(mr->meshes[i], mr->materials[i], entity->GetWorldMatrix());
+        }
+    for(auto& child : entity->children) {
+        RenderEntity(child);
+    }
+}
+
 
 void Renderer::DrawMesh(Mesh *mesh, Material *material, const glm::mat4 &modelMatrix)
 {
@@ -33,6 +41,7 @@ void Renderer::DrawMesh(Mesh *mesh, Material *material, const glm::mat4 &modelMa
     glBindVertexArray(mesh->GetVAO());
     glDrawElements(GL_TRIANGLES, mesh->GetIndices().size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    material->UnBind();
 }
 
 glm::mat4 Renderer::GetViewMatrix()
