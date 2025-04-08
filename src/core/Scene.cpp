@@ -1,7 +1,9 @@
 #include "core/Scene.h"
 
+#include "rendering/LightData.h"
 #include "rendering/Renderer.h"
 #include "components/Camera.h"
+#include "components/LightComponent.h"
 
 #include <algorithm>
 #include <iostream>
@@ -87,4 +89,25 @@ const std::vector<GameObject*>& Scene::GetGameObjects() const {
 const std::vector<Entity *> &Scene::GetEntities() const
 {
     return entities;
+}
+
+void Scene::GatherLights(std::vector<LightData>& lightsOut) {
+    for (Entity* entity : entities) {
+        auto* light = entity->GetComponent<LightComponent>();
+        if (!light) continue;
+
+        LightData data;
+        data.type = static_cast<int>(light->type);
+        data.color = light->color * light->intensity;
+        data.position = entity->GetWorldPosition();
+        data.direction = entity->transform.GetForwardDirection();
+        data.range = light->range;
+        data.spotAngle = light->spotAngle;
+        data.castShadows = light->castShadows;
+
+        lightsOut.push_back(data);
+
+        if (light->type == LightType::Directional && light->isMainDirectional)
+            mainDirectionalLight = data;
+    }
 }

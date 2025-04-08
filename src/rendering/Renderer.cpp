@@ -12,8 +12,10 @@ void Renderer::RenderScene(Scene& scene, Camera& camera) {
 
 void Renderer::RenderScene(Scene &scene)
 {
-    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    lightsToRender.clear();
+    scene.GatherLights(lightsToRender);
 
     for(auto& entity : scene.GetEntities()) {
         RenderEntity(entity);
@@ -37,6 +39,7 @@ void Renderer::DrawMesh(Mesh *mesh, Material *material, const glm::mat4 &modelMa
     material->Bind();
     Shader* shader = material->GetShader();
     shader->SetMat4("u_Model", modelMatrix);
+    shader->ApplyLightUniforms(lightsToRender);
 
     glBindVertexArray(mesh->GetVAO());
     glDrawElements(GL_TRIANGLES, mesh->GetIndices().size(), GL_UNSIGNED_INT, 0);

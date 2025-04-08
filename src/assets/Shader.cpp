@@ -80,6 +80,24 @@ void Shader::ApplyGlobalUniforms()
     SetVec3("u_CameraPos", Renderer::GetCameraPosition());
 }
 
+
+void Shader::ApplyLightUniforms(const std::vector<LightData>& lights) {
+    for (int i = 0; i < lights.size(); ++i) {
+        const auto& light = lights[i];
+        std::string prefix = "u_Lights[" + std::to_string(i) + "]";
+
+        SetInt(prefix + ".type", light.type);
+        SetVec3(prefix + ".color", light.color);
+        SetVec3(prefix + ".position", light.position);
+        SetFloat(prefix + ".range", light.range);
+        SetVec3(prefix + ".direction", light.direction);
+        SetFloat(prefix + ".spotAngle", light.spotAngle);
+        SetInt(prefix + ".castShadows", light.castShadows);
+    }
+
+    SetInt("u_LightCount", static_cast<int>(lights.size()));
+}
+
 void Shader::Use() {
     glUseProgram(programID);
 }

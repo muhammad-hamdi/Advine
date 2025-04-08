@@ -4,10 +4,13 @@
 #include "core/Camera.h"
 #include "core/GameObject.h"
 #include "core/Entity.h"
+#include "rendering/LightData.h"
 
 #include <map>
 #include <vector>
 #include <memory>
+
+struct LightData;
 
 class Scene {
 public:
@@ -43,10 +46,13 @@ public:
     const std::vector<GameObject*>& GetGameObjects() const;
     const std::vector<Entity*>& GetEntities() const;
 
+    void GatherLights(std::vector<LightData> &lightsOut);
+
 private:
     std::vector<GameObject*> gameObjects;
     std::vector<Entity*> entities;
     Entity* activeCameraEntity = nullptr;
+    LightData mainDirectionalLight;
     std::map<std::string, Camera*> cameras;  // Store cameras by name
     Camera* activeCamera = nullptr;          // The active camera
 };

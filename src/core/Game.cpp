@@ -5,6 +5,7 @@
 #include "assets/AssetManager.h"
 #include "core/Entity.h"
 #include "components/Camera.h"
+#include "components/LightComponent.h"
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -111,6 +112,9 @@ void Game::SetupScene() {
     monkeyEntity->transform.position = {5, 0, -5};
     Entity* nanosuitEntity = loader->LoadAssimp("assets/models/nanosuit/nanosuit.obj");
     nanosuitEntity->transform.position = {-5, 0, -5};
+    Entity* boxEntity = loader->LoadAssimp("assets/models/cube.gltf");
+    boxEntity->transform.position = {0, -5, 0};
+    boxEntity->transform.scale = {10, 0.2, 10};
 
     Entity* cameraEntity = scene->CreateEntity("MainCamera");
     cameraEntity->transform.position = {0, 0, 0};
@@ -119,6 +123,7 @@ void Game::SetupScene() {
 
     scene->AddEntity(monkeyEntity);
     scene->AddEntity(nanosuitEntity);
+    scene->AddEntity(boxEntity);
 }
 
 void Game::AddObjectToScene(GameObject* object) {

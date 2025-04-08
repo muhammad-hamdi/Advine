@@ -1,13 +1,16 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "rendering/LightData.h"
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 struct UniformInfo {
     std::string name;
@@ -21,6 +24,7 @@ public:
     std::unordered_map<std::string, GLint> locations;
 
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
+    void ApplyLightUniforms(const std::vector<LightData> &lights);
     void Use();
     void SetMat4(const std::string& name, const glm::mat4& value);
     void SetVec3(const std::string& name, const glm::vec3& value);

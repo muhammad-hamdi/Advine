@@ -22,6 +22,7 @@ private:
     inline static glm::mat4 viewMatrix;
     inline static glm::mat4 projectionMatrix;
     inline static glm::vec3 cameraPosition;
+    inline static std::vector<LightData> lightsToRender;
 };
 
 #endif
