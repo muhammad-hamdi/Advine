@@ -13,7 +13,8 @@ Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane) {
     up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
-glm::mat4 Camera::GetViewMatrix() const {
+glm::mat4 Camera::GetViewMatrix() const
+{
     return glm::lookAt(position, position + front, up);
 }
 

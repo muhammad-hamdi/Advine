@@ -1,8 +1,11 @@
 #include "core/Scene.h"
-#include "core/Renderer.h"
+
+#include "rendering/Renderer.h"
+#include "components/Camera.h"
 
 #include <algorithm>
 #include <iostream>
+#include "Scene.h"
 
 Scene::Scene() {
     // Optionally, you can initialize a default camera or other scene components.
@@ -27,6 +30,17 @@ void Scene::AddCamera(const std::string& name, Camera* camera) {
     cameras[name] = camera;
 }
 
+void Scene::SetActiveCamera(Entity *entity)
+{
+    entity->GetComponent<CameraComponent>()->isActive = true;
+    activeCameraEntity = entity;
+}
+
+Entity *Scene::GetActiveCameraEntity() const
+{
+    return activeCameraEntity;
+}
+
 // Set the active camera by name
 void Scene::SetActiveCamera(const std::string& name) {
     if (cameras.find(name) != cameras.end()) {
@@ -34,11 +48,13 @@ void Scene::SetActiveCamera(const std::string& name) {
     }
 }
 
-Camera* Scene::GetActiveCamera() const {
+Camera *Scene::GetActiveCamera() const
+{
     return activeCamera;
 }
 
-void Scene::Update(float deltaTime) {
+void Scene::Update(float deltaTime)
+{
     // Here, we could update GameObjects for things like physics, animation, etc.
     for (const auto& obj : gameObjects) {
         // For each GameObject, we can update its state
@@ -49,4 +65,9 @@ void Scene::Update(float deltaTime) {
 
 const std::vector<GameObject*>& Scene::GetGameObjects() const {
     return gameObjects;
+}
+
+const std::vector<Entity *> &Scene::GetEntities() const
+{
+    return entities;
 }

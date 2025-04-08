@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "UI.h"
-#include "game/GameObject.h"
+#include "core/GameObject.h"
 #include <GLFW/glfw3.h>
 
 class Game {
@@ -26,8 +26,8 @@ private:
     Camera* camera;
     UI* uiManager;
 
-    int windowWidth;
-    int windowHeight;
+    inline static int windowWidth;
+    inline static int windowHeight;
 
     int viewportWidth;
 

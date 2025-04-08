@@ -1,7 +1,8 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 #include "core/Camera.h"
-#include "graphics/Model.h"
+#include "core/Transform.h"
+#include "assets/Model.h"
 
 #include <glm/glm.hpp>
 
@@ -16,9 +17,13 @@ public:
     glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
+    Transform transform;
+
     std::vector<GameObject*> children;
 
     Model* model = nullptr;
+    Mesh* mesh = nullptr;
+
     Material* globalMaterial = nullptr;
     std::unordered_map<Mesh*, Material*> materialOverrides;
 
@@ -42,14 +47,15 @@ public:
 
     Material* GetMaterialForMesh(Mesh* mesh);
 
+    void SetTransform(const glm::mat4& transform);
     void SetPosition(const glm::vec3& position);
     void SetRotation(const glm::vec3& rotation);
     void SetScale(const glm::vec3& scale);
+
     glm::mat4 GetTransform() const;
     glm::vec3 GetPosition() const;
     glm::vec3 GetRotation() const;
     glm::vec3 GetScale() const;
-
 };
 
 #endif

@@ -3,10 +3,10 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-#include "graphics/Model.h"
-#include "graphics/Shader.h"
-#include "graphics/Texture.h"
-#include "graphics/Material.h"
+#include "assets/Model.h"
+#include "assets/Shader.h"
+#include "assets/Texture.h"
+#include "rendering/Material.h"
 
 class AssetManager {
 public:

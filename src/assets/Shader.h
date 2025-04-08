@@ -2,7 +2,7 @@
 #define SHADER_H
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -18,7 +18,7 @@ struct UniformInfo {
 class Shader {
 public:
     GLuint programID;
-    std::map<std::string, GLint> locations;
+    std::unordered_map<std::string, GLint> locations;
 
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
     void Use();
@@ -26,6 +26,7 @@ public:
     void SetVec3(const std::string& name, const glm::vec3& value);
     void SetFloat(const std::string& name, const float value);
     void SetInt(const std::string& name, const int value);
+    void ApplyGlobalUniforms();
 
     std::vector<UniformInfo> GetCustomUniforms();
 

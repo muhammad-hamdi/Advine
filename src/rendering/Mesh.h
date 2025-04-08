@@ -1,10 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <vector>
+#include "assets/Shader.h"
+#include "rendering/Material.h"
+
 #include <glm/glm.hpp>
-#include "Shader.h"
-#include "Material.h"
+
+#include <vector>
 
 struct Vertex {
     glm::vec3 position;
@@ -15,6 +17,7 @@ struct Vertex {
 class Mesh {
 public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material* material);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
     void Draw();
 
     unsigned int GetVAO() const { return VAO; }

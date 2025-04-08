@@ -1,9 +1,9 @@
 // GameObject.cpp
 #include "GameObject.h"
-#include "graphics/Model.h"
-#include "graphics/Mesh.h"
-#include "graphics/Material.h"
-#include "graphics/Shader.h"
+#include "assets/Model.h"
+#include "assets/Shader.h"
+#include "rendering/Mesh.h"
+#include "rendering/Material.h"
 
 int GameObject::objectCount = 0;
 
@@ -25,11 +25,11 @@ void GameObject::Update(float deltaTime)
 {
 }
 static int counter = 0;
-void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
+void GameObject::Render(const Camera& camera, glm::mat4 accumalatedTransform) {
     counter++;
     if (!model) return;
 
-    glm::mat4 modelMatrix = globalTransform; // Use the combined global transform
+    glm::mat4 modelMatrix = accumalatedTransform;
 
     for (Mesh& mesh : model->GetMeshes()) {
         Material* material = GetMaterialForMesh(&mesh);
@@ -46,6 +46,11 @@ void GameObject::Render(const Camera& camera, glm::mat4 globalTransform) {
         mesh.Draw();
         material->UnBind();
     }
+}
+
+void GameObject::SetTransform(const glm::mat4 &newTransform)
+{
+    // transform.setLocalPosition(newTransform);
 }
 
 void GameObject::SetPosition(const glm::vec3 &newPosition)

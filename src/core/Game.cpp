@@ -1,8 +1,10 @@
 #include "Game.h"
 
 #include "core/Input.h"
-#include "core/Renderer.h"
-#include "core/AssetManager.h"
+#include "rendering/Renderer.h"
+#include "assets/AssetManager.h"
+#include "core/Entity.h"
+#include "components/Camera.h"
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -11,8 +13,10 @@
 
 #include <iostream>
 
-Game::Game(int windowWidth, int windowHeight, const char* windowTitle) 
-    : windowWidth(windowWidth), windowHeight(windowHeight), window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
+Game::Game(int winWidth, int winHeight, const char* windowTitle) 
+    : window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
+    windowWidth = winWidth;
+    windowHeight = winHeight;
     Initialize();
 }
 
@@ -160,6 +164,20 @@ void Game::Update(float deltaTime) {
 void Game::Render() {
     glClearColor(0.45f, 0.55f, 0.60f, 1.00f); // Clear screen color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Entity* activeCameraEntity = scene->GetActiveCameraEntity();
+    
+    if (activeCameraEntity) {
+        auto* cam = activeCameraEntity->GetComponent<CameraComponent>();
+        glm::mat4 view = cam->GetViewMatrix(
+            activeCameraEntity->GetWorldPosition(),
+            activeCameraEntity->transform.GetForwardDirection(),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+    
+        glm::mat4 projection = cam->GetProjectionMatrix(windowWidth/windowHeight);
+        Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
+    }
+
     Renderer::RenderScene(*scene, *scene->GetActiveCamera());
     
     uiManager->StartFrame();

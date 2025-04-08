@@ -1,4 +1,7 @@
 #include "Shader.h"
+
+#include "rendering/Renderer.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -68,6 +71,13 @@ void Shader::CheckProgramLinking() {
 bool Shader::IsStandardUniform(const std::string &name) const
 {
     return name == "model" || name == "view" || name == "projection";
+}
+
+void Shader::ApplyGlobalUniforms()
+{
+    SetMat4("u_View", Renderer::GetViewMatrix());
+    SetMat4("u_Projection", Renderer::GetProjectionMatrix());
+    SetVec3("u_CameraPos", Renderer::GetCameraPosition());
 }
 
 void Shader::Use() {

@@ -1,11 +1,11 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <variant>
+#include "assets/Shader.h"
+#include "assets/Texture.h"
+
 #include <vector>
 #include <unordered_map>
-#include "Shader.h"
-#include "Texture.h"
 
 union UniformValue {
     float f;
