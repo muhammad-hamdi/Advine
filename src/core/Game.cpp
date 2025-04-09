@@ -108,6 +108,7 @@ void Game::SetupScene() {
 
     Model* loader = new Model();
 
+    Entity* sonicEntity = loader->LoadAssimp("assets/models/sonic_the_hedgehog_running/scene.gltf");
     Entity* monkeyEntity = loader->LoadAssimp("assets/models/monkey_textured.gltf");
     monkeyEntity->transform.position = {5, 0, -5};
     Entity* nanosuitEntity = loader->LoadAssimp("assets/models/nanosuit/nanosuit.obj");
@@ -116,11 +117,23 @@ void Game::SetupScene() {
     boxEntity->transform.position = {0, -5, 0};
     boxEntity->transform.scale = {10, 0.2, 10};
 
+
     Entity* cameraEntity = scene->CreateEntity("MainCamera");
-    cameraEntity->transform.position = {0, 0, 0};
+    cameraEntity->transform.position = {-5, 5, 0};
+    cameraEntity->transform.setLocalRotation({ 0, 45, 0 });
     cameraEntity->AddComponent<CameraComponent>()->isActive = true;
     scene->SetActiveCamera(cameraEntity);
 
+    Entity* directionalLight = scene->CreateEntity("sun");
+    directionalLight->AddComponent<LightComponent>(LightType::Directional);
+    directionalLight->transform.setLocalRotation({45.0f, 0.0, 0.0});
+
+    Entity* pointLight = scene->CreateEntity("lamp");
+    auto lc = pointLight->AddComponent<LightComponent>(LightType::Point);
+    lc->color = {1.0f, 1.0f, 0.0f};
+    pointLight->transform.position = {0, 5, 0};
+
+    // scene->AddEntity(sonicEntity);
     scene->AddEntity(monkeyEntity);
     scene->AddEntity(nanosuitEntity);
     scene->AddEntity(boxEntity);

@@ -9,6 +9,10 @@ struct LightData {
     glm::vec3 direction;       // For directional and spot lights
 
     float range;          // Attenuation range
+    // Attenuation formula
+    float constant;
+    float linear;
+    float quadratic;
 
     float spotAngle;      // In radians for spot lights
 

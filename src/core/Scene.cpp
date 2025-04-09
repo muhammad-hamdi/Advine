@@ -102,6 +102,9 @@ void Scene::GatherLights(std::vector<LightData>& lightsOut) {
         data.position = entity->GetWorldPosition();
         data.direction = entity->transform.GetForwardDirection();
         data.range = light->range;
+        data.constant = light->constant;
+        data.linear = light->linear;
+        data.quadratic = light->quadratic;
         data.spotAngle = light->spotAngle;
         data.castShadows = light->castShadows;
 

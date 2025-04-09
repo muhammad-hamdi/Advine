@@ -12,7 +12,7 @@ void Renderer::RenderScene(Scene& scene, Camera& camera) {
 
 void Renderer::RenderScene(Scene &scene)
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     lightsToRender.clear();
     scene.GatherLights(lightsToRender);

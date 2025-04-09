@@ -147,6 +147,31 @@ void UI::ShowGameObjectEditor(Scene *scene)
         ImGui::Text("Select a GameObject");
     }
 
+    if(selectedEntity != nullptr) {
+        if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+            // Show the properties of the selected game selectedObjectect
+            // Display the position
+            glm::vec3 position = selectedEntity->transform.getLocalPosition();
+            if (ImGui::DragFloat3("Position", &position[0])) {
+                selectedEntity->transform.setLocalPosition(position);
+            }
+
+            // Display the rotation
+            glm::vec3 rotation = selectedEntity->transform.getLocalRotation();
+            if (ImGui::DragFloat3("Rotation", &rotation[0])) {
+                selectedEntity->transform.setLocalRotation(rotation);
+            }
+
+            // Display the scale
+            glm::vec3 scale = selectedEntity->transform.getLocalScale();
+            if (ImGui::DragFloat3("Scale", &scale[0])) {
+                selectedEntity->transform.setLocalScale(scale);
+            }
+
+            ImGui::TreePop();
+        }
+    }
+
     ImGui::End();
 }
 
@@ -183,7 +208,6 @@ void UI::DrawSceneGraph(Entity *n, int id)
         if (ImGui::IsItemClicked())
         {
             selectedEntity = n;
-            printf("Position: %f, %f, %f\n", n->GetWorldPosition().x, n->GetWorldPosition().y, n->GetWorldPosition().z);
         }
         for (auto child: n->children)
             DrawSceneGraph(child, id++);

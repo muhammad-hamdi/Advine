@@ -90,6 +90,9 @@ void Shader::ApplyLightUniforms(const std::vector<LightData>& lights) {
         SetVec3(prefix + ".color", light.color);
         SetVec3(prefix + ".position", light.position);
         SetFloat(prefix + ".range", light.range);
+        SetFloat(prefix + ".constant", light.constant);
+        SetFloat(prefix + ".linear", light.linear);
+        SetFloat(prefix + ".quadratic", light.quadratic);
         SetVec3(prefix + ".direction", light.direction);
         SetFloat(prefix + ".spotAngle", light.spotAngle);
         SetInt(prefix + ".castShadows", light.castShadows);

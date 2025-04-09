@@ -46,12 +46,6 @@ void Transform::computeModelMatrix(const glm::mat4& parentGlobalModelMatrix)
     dirty = false;
 }
 
-void Transform::setLocalPosition(const glm::vec3& newPosition)
-{
-    position = newPosition;
-    dirty = true;
-}
-
 const glm::vec3& Transform::getLocalPosition()
 {
     return position;
@@ -62,15 +56,21 @@ const glm::vec3& Transform::getLocalRotation()
     return eulerRotation;
 }
 
+const glm::vec3& Transform::getLocalScale()
+{
+    return scale;
+}
+
+void Transform::setLocalPosition(const glm::vec3& newPosition)
+{
+    position = newPosition;
+    dirty = true;
+}
+
 void Transform::setLocalRotation(const glm::vec3& newRotation)
 {
     eulerRotation = newRotation;
     dirty = true;
-}
-
-const glm::vec3& Transform::getLocalScale()
-{
-    return scale;
 }
 
 void Transform::setLocalScale(const glm::vec3& newScale)
