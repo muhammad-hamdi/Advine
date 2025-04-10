@@ -47,7 +47,8 @@ Material* AssetManager::LoadMaterial(const std::string& name, const std::string&
 
     Shader* shader = LoadShader(vertexPath + fragmentPath, vertexPath, fragmentPath);
     Texture* texture = LoadTexture(texturePath, texturePath);
-    auto newMaterial = std::make_unique<Material>(name, shader, texture);
+    auto newMaterial = std::make_unique<Material>(name, shader);
+    newMaterial.get()->diffuseTextures.push_back(texture);
 
     materials[name] = std::move(newMaterial);
     return materials[name].get();

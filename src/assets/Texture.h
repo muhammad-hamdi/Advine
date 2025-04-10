@@ -10,6 +10,7 @@ public:
     GLuint ID;
     std::string type;
     std::string path;
+    int width, height;
 
     Texture(const std::string& imagePath, const std::string& type = "diffuse");
 

@@ -39,7 +39,11 @@ void Renderer::DrawMesh(Mesh *mesh, Material *material, const glm::mat4 &modelMa
     material->Bind();
     Shader* shader = material->GetShader();
     shader->SetMat4("u_Model", modelMatrix);
-    shader->ApplyLightUniforms(lightsToRender);
+    if(material->isLit) {
+        shader->ApplyLightUniforms(lightsToRender);
+    } else {
+        shader->SetInt("u_IsLit", false);
+    }
 
     glBindVertexArray(mesh->GetVAO());
     glDrawElements(GL_TRIANGLES, mesh->GetIndices().size(), GL_UNSIGNED_INT, 0);

@@ -18,7 +18,7 @@ void Texture::LoadFromFile(const std::string& path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Load image
-    int width, height, nrChannels;
+    int nrChannels;
     stbi_set_flip_vertically_on_load(true); // Flip to match OpenGL convention
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 

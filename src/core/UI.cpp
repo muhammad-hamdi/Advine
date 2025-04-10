@@ -1,13 +1,19 @@
 #include "UI.h"
-#include <algorithm>
-#include <string>
+
+#include "core/Game.h"
+#include "components/Camera.h"
+#include "components/MeshRenderer.h"
+#include "components/LightComponent.h"
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include "Game.h"
+
+#include <algorithm>
+#include <string>
+#include <math.h>
 
 UI::UI(GLFWwindow *window): window(window)
 {
@@ -81,9 +87,11 @@ void UI::ShowGameObjectEditor(Scene *scene)
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
+    int windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoTitleBar;
+
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(imguiPanelWidth, windowHeight));
-    ImGui::Begin("Left Panel", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    ImGui::Begin("Left Panel", NULL, windowFlags);
     if(ImGui::Button("Deselect")) {
         selectedObject = nullptr;
     }
@@ -102,7 +110,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
 
     ImGui::SetNextWindowPos(ImVec2(windowWidth - imguiPanelWidth, 0));
     ImGui::SetNextWindowSize(ImVec2(imguiPanelWidth, windowHeight));
-    ImGui::Begin("Right Panel", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    ImGui::Begin("Right Panel", NULL, windowFlags);
     if(selectedObject != nullptr) {
         ImGui::Text("Name");
         ImGui::SameLine();
@@ -143,32 +151,82 @@ void UI::ShowGameObjectEditor(Scene *scene)
             }
             ImGui::TreePop();
         }
-    } else {
-        ImGui::Text("Select a GameObject");
     }
 
     if(selectedEntity != nullptr) {
+        ImGui::Text("Name");
+        ImGui::SameLine();
+        ImGui::InputText("##NameInput", &selectedEntity->name);
         if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-            // Show the properties of the selected game selectedObjectect
             // Display the position
             glm::vec3 position = selectedEntity->transform.getLocalPosition();
-            if (ImGui::DragFloat3("Position", &position[0])) {
+            if (ImGui::DragFloat3("Position", &position[0], 0.1f)) {
                 selectedEntity->transform.setLocalPosition(position);
             }
 
             // Display the rotation
             glm::vec3 rotation = selectedEntity->transform.getLocalRotation();
-            if (ImGui::DragFloat3("Rotation", &rotation[0])) {
+            if (ImGui::DragFloat3("Rotation", &rotation[0], 0.1f)) {
                 selectedEntity->transform.setLocalRotation(rotation);
             }
 
             // Display the scale
             glm::vec3 scale = selectedEntity->transform.getLocalScale();
-            if (ImGui::DragFloat3("Scale", &scale[0])) {
+            if (ImGui::DragFloat3("Scale", &scale[0], 0.1f)) {
                 selectedEntity->transform.setLocalScale(scale);
             }
-
             ImGui::TreePop();
+        }
+
+        for(auto &comp : selectedEntity->components) {
+            ImGui::Separator();
+            if(Camera* camera = dynamic_cast<Camera*>(comp.get())) {
+                // do camera stuff, maybe skybox cubemap
+            }
+            else if(LightComponent* lc = dynamic_cast<LightComponent*>(comp.get())) {
+                if(ImGui::TreeNode("Light Component")) {
+                    ImGui::ColorEdit3("Color", &lc->color[0]);
+                    ImGui::SliderFloat("Intensity", &lc->intensity, 0.f, 1.0f);
+                    if(lc->type != LightType::Directional) {
+                        ImGui::Text("Attenuation Factors");
+                        ImGui::SliderFloat("Constant", &lc->constant, 0.f, 1.0f);
+                        ImGui::SliderFloat("Linear", &lc->linear, 0.f, 1.0f);
+                        ImGui::SliderFloat("Quadratic", &lc->quadratic, 0.f, 1.0f);
+                    }
+                    if(lc->type == LightType::Spot) {
+                        float spotAngle = glm::degrees(lc->spotAngle);
+                        if(ImGui::DragFloat("Spot Angle", &spotAngle)) {
+                            lc->spotAngle = glm::radians(spotAngle);
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+            }
+            else if (MeshRenderer* mr = dynamic_cast<MeshRenderer*>(comp.get())) {
+                if(ImGui::TreeNode("MeshRenderer")) {
+                    for(int i = 0; i < mr->meshes.size(); i++) {
+                        auto mat = mr->materials[i];
+                        ImGui::Text("Material:");
+                        ImGui::SameLine();
+                        ImGui::Text(mat->name.c_str());
+                        ImGui::Checkbox("Is Lit", &mat->isLit);
+                        if(ImGui::TreeNode("Textures")) {
+                            for(int i = 0; i < mat->diffuseTextures.size(); i++) {
+                                auto tex = mat->diffuseTextures[i];
+                                ImGui::InputText("Diffuse##" + i, &tex->path);
+                                ImGui::Image(tex->ID, ImVec2(__max(tex->width/5, 256), __max(tex->height/5, 256)));
+                            }
+                            for(int i = 0; i < mat->specularTextures.size(); i++) {
+                                auto tex = mat->specularTextures[i];
+                                ImGui::InputText("Specular ##" + i, &tex->path);
+                                ImGui::Image(tex->ID, ImVec2(__max(tex->width/5, 256), __max(tex->height/5, 256)));
+                            }
+                            ImGui::TreePop();
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+            }
         }
     }
 

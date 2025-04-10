@@ -251,28 +251,27 @@ Material* Model::LoadMaterial(aiMaterial* aiMat, const std::filesystem::path& ba
     std::string matName = name.C_Str();
     if (auto* cached = AssetManager::GetMaterial(matName))
         return cached;
+    
+    Shader* shader = AssetManager::GetShader("default");
+    if (!shader)
+        shader = AssetManager::LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");    
+    
+    Material* material = new Material(matName, shader);
 
-    Texture* diffuse = nullptr;
-    Texture* specular = nullptr;
-    if (aiMat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+    for(int i = 0; i < aiMat->GetTextureCount(aiTextureType_DIFFUSE); i++) {
         aiString texPath;
         aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
         std::string fullPath = (baseDir / texPath.C_Str()).string();
-        diffuse = AssetManager::LoadTexture(texPath.C_Str(), fullPath);
+        material->diffuseTextures.push_back(AssetManager::LoadTexture(texPath.C_Str(), fullPath));
     }
 
-    if (aiMat->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+    for(int i = 0; i < aiMat->GetTextureCount(aiTextureType_SPECULAR); i++) {
         aiString texPath;
         aiMat->GetTexture(aiTextureType_SPECULAR, 0, &texPath);
         std::string fullPath = (baseDir / texPath.C_Str()).string();
-        specular = AssetManager::LoadTexture(texPath.C_Str(), fullPath);
+        material->specularTextures.push_back(AssetManager::LoadTexture(texPath.C_Str(), fullPath));
     }
 
-    Shader* shader = AssetManager::GetShader("default");
-    if (!shader)
-        shader = AssetManager::LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
-
-    Material* material = new Material(matName, shader, diffuse, specular);
     AssetManager::AddMaterial(matName, material);
     return material;
 }

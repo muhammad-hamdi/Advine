@@ -5,6 +5,7 @@
 #include "assets/AssetManager.h"
 #include "core/Entity.h"
 #include "components/Camera.h"
+#include "components/MeshRenderer.h"
 #include "components/LightComponent.h"
 
 #include <GLFW/glfw3.h>
@@ -126,14 +127,20 @@ void Game::SetupScene() {
 
     Entity* directionalLight = scene->CreateEntity("sun");
     directionalLight->AddComponent<LightComponent>(LightType::Directional);
-    directionalLight->transform.setLocalRotation({45.0f, 0.0, 0.0});
+    directionalLight->transform.setLocalRotation({-45.0f, 0.0, 0.0});
 
-    Entity* pointLight = scene->CreateEntity("lamp");
+    Entity* pointLight = loader->LoadAssimp("assets/models/ball.gltf");
+    
+    // scene->CreateEntity("lamp");
     auto lc = pointLight->AddComponent<LightComponent>(LightType::Point);
     lc->color = {1.0f, 1.0f, 0.0f};
     pointLight->transform.position = {0, 5, 0};
+    auto mr = pointLight->GetComponent<MeshRenderer>();
+    mr->materials[0]->SetShader(AssetManager::LoadShader("emissive", "assets/shaders/default.vert", "assets/shaders/emissive.frag"));
+    printf("%s\n", mr->materials[0]->diffuseTextures[0]->path.c_str());
 
     // scene->AddEntity(sonicEntity);
+    scene->AddEntity(pointLight);
     scene->AddEntity(monkeyEntity);
     scene->AddEntity(nanosuitEntity);
     scene->AddEntity(boxEntity);
@@ -164,9 +171,6 @@ void Game::Run() {
 }
 
 void Game::ProcessInput(float deltaTime) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
     Input::Update();
     // Other input handling (camera movement, etc.) can be added here.
     if (Input::IsMousePressed(GLFW_MOUSE_BUTTON_RIGHT)) {

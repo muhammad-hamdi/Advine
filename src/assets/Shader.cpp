@@ -99,6 +99,7 @@ void Shader::ApplyLightUniforms(const std::vector<LightData>& lights) {
     }
 
     SetInt("u_LightCount", static_cast<int>(lights.size()));
+    SetInt("u_IsLit", true);
 }
 
 void Shader::Use() {

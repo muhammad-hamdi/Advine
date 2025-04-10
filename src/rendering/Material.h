@@ -24,11 +24,19 @@ class Material {
 public:
     std::string name;
     Shader* shader;
-    Texture* diffuseTexture;
-    Texture* specularTexture;
+    std::vector<Texture*> diffuseTextures;
+    std::vector<Texture*> specularTextures;
+
+    // TODO: material props when no texture, and base ambience, also pass shininess for specular exponent
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+
+    bool isLit = true;
 
     Material(const std::string& name, Shader* shader, Texture* diffuseTexture = nullptr, Texture* specularTexture = nullptr)
-        : name(name), shader(shader), diffuseTexture(diffuseTexture), specularTexture(specularTexture) {
+        : name(name), shader(shader) {
             if (shader) {
                 uniformMetadata = shader->GetCustomUniforms();
                 GetUniformValues();

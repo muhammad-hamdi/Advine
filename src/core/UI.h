@@ -9,7 +9,7 @@ public:
     UI(GLFWwindow* window);
     ~UI();
 
-    static const int imguiPanelWidth = 250;
+    static const int imguiPanelWidth = 300;
     GameObject* selectedObject = nullptr;
     Entity* selectedEntity = nullptr;
 

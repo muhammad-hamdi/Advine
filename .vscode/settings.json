@@ -71,7 +71,9 @@
         "span": "cpp",
         "stop_token": "cpp",
         "text_encoding": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "*.def": "cpp",
+        "*.inc": "cpp"
     },
     "C_Cpp.default.compilerPath": "C:/msys64/mingw64/bin/g++.exe"
 }

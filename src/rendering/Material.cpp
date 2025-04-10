@@ -5,14 +5,16 @@ void Material::Bind()
     if (!shader) return;
     shader->Use();
 
-    if (diffuseTexture) {
-        diffuseTexture->Bind(0); // Activate and bind to texture unit 0
-        shader->SetInt("u_DiffuseTexture", 0); // Assumes uniform name in shader
+    int unit = 0;
+    for(int i = 0; i < diffuseTextures.size(); i++, unit++) {
+        diffuseTextures[i]->Bind(unit);
+        // name in shader u_DiffuseTextureN
+        shader->SetInt("u_DiffuseTexture" + std::to_string(i+1), unit);
     }
 
-    if (specularTexture) {
-        specularTexture->Bind(1); // Activate and bind to texture unit 1
-        shader->SetInt("u_SpecularTexture", 1); // Assumes uniform name in shader
+    for(int i = 0; i < specularTextures.size(); i++, unit++) {
+        specularTextures[i]->Bind(unit);
+        shader->SetInt("u_SpecularTexture" + std::to_string(i+1), unit);
     }
 
     for (const auto& [name, value] : customUniforms) {
@@ -38,17 +40,17 @@ void Material::Bind()
 
 void Material::UnBind() {
     if (!shader) return;
-
     shader->Use();
 
-    if (diffuseTexture) {
-        diffuseTexture->UnBind(0);
-        shader->SetInt("texture_diffuse", -1);
+    int unit = 0;
+    for(int i = 0; i < diffuseTextures.size(); i++, unit++) {
+        diffuseTextures[i]->UnBind(unit);
+        shader->SetInt("u_DiffuseTexture" + std::to_string(i+1), -1);
     }
 
-    if (specularTexture) {
-        specularTexture->UnBind(1);
-        shader->SetInt("texture_specular", -1);
+    for(int i = 0; i < specularTextures.size(); i++, unit++) {
+        specularTextures[i]->UnBind(unit);
+        shader->SetInt("u_SpecularTexture" + std::to_string(i+1), -1);
     }
 }
 
