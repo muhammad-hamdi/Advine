@@ -110,18 +110,24 @@ void Game::SetupScene() {
     Model* loader = new Model();
 
     Entity* sonicEntity = loader->LoadAssimp("assets/models/sonic_the_hedgehog_running/scene.gltf");
+    auto sonicSkeleton = sonicEntity->children[0]->children[1];
+    sonicSkeleton->transform.setLocalRotation({-90, 0, 0});
+    sonicSkeleton->transform.position = {5, 7, -5};
+    sonicSkeleton->transform.scale = glm::vec3(0.2f);
+
     Entity* monkeyEntity = loader->LoadAssimp("assets/models/monkey_textured.gltf");
     monkeyEntity->transform.position = {5, 0, -5};
+
     Entity* nanosuitEntity = loader->LoadAssimp("assets/models/nanosuit/nanosuit.obj");
     nanosuitEntity->transform.position = {-5, 0, -5};
+
     Entity* boxEntity = loader->LoadAssimp("assets/models/cube.gltf");
     boxEntity->transform.position = {0, -5, 0};
     boxEntity->transform.scale = {10, 0.2, 10};
 
-
     Entity* cameraEntity = scene->CreateEntity("MainCamera");
-    cameraEntity->transform.position = {-5, 5, 0};
-    cameraEntity->transform.setLocalRotation({ 0, 45, 0 });
+    cameraEntity->transform.position = {0, 8, 15};
+    cameraEntity->transform.setLocalRotation({ 0, -90, 0 });
     cameraEntity->AddComponent<CameraComponent>()->isActive = true;
     scene->SetActiveCamera(cameraEntity);
 
@@ -130,16 +136,18 @@ void Game::SetupScene() {
     directionalLight->transform.setLocalRotation({-45.0f, 0.0, 0.0});
 
     Entity* pointLight = loader->LoadAssimp("assets/models/ball.gltf");
-    
+    pointLight->name = "lamp";
     // scene->CreateEntity("lamp");
     auto lc = pointLight->AddComponent<LightComponent>(LightType::Point);
     lc->color = {1.0f, 1.0f, 0.0f};
+    lc->linear = 0.09;
+    lc->quadratic = 0.032;
     pointLight->transform.position = {0, 5, 0};
     auto mr = pointLight->GetComponent<MeshRenderer>();
     mr->materials[0]->SetShader(AssetManager::LoadShader("emissive", "assets/shaders/default.vert", "assets/shaders/emissive.frag"));
     printf("%s\n", mr->materials[0]->diffuseTextures[0]->path.c_str());
 
-    // scene->AddEntity(sonicEntity);
+    scene->AddEntity(sonicEntity);
     scene->AddEntity(pointLight);
     scene->AddEntity(monkeyEntity);
     scene->AddEntity(nanosuitEntity);

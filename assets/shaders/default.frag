@@ -95,9 +95,9 @@ void main()
     if (length(diffuseColor) <= 0.01) diffuseColor = u_ObjectColor;
 
     vec3 specularColor = texture(u_SpecularTexture1, TexCoord).rgb;
-    if (length(specularColor) <= 0.01) specularColor = vec3(1.0);
+    if (length(specularColor) <= 0.01) specularColor = vec3(0.2); // TODO: add material (ambient, diffuse, specular) properties as fallback
 
-    vec3 ambientLightColor = vec3(0.1);
+    vec3 ambientLightColor = vec3(0.1); // TODO: add global ambient color, maybe the clear color? or the directional light color but damped
     vec3 ambient = ambientLightColor * diffuseColor;
     vec3 finalColor = ambient;
 
