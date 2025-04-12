@@ -107,12 +107,15 @@ void Game::SetupScene() {
     scene->AddGameObject(ground);
 #endif
 
+    scene = new Scene("assets/scenes/testing.json");
+
+#if 0
     Model* loader = new Model();
 
     Entity* sonicEntity = loader->LoadAssimp("assets/models/sonic_the_hedgehog_running/scene.gltf");
     auto sonicSkeleton = sonicEntity->children[0]->children[1];
-    sonicSkeleton->transform.setLocalRotation({-90, 0, 0});
     sonicSkeleton->transform.position = {5, 7, -5};
+    sonicSkeleton->transform.setLocalRotation({-90, 0, 0});
     sonicSkeleton->transform.scale = glm::vec3(0.2f);
 
     Entity* monkeyEntity = loader->LoadAssimp("assets/models/monkey_textured.gltf");
@@ -133,7 +136,7 @@ void Game::SetupScene() {
 
     Entity* directionalLight = scene->CreateEntity("sun");
     directionalLight->AddComponent<LightComponent>(LightType::Directional);
-    directionalLight->transform.setLocalRotation({-45.0f, 0.0, 0.0});
+    directionalLight->transform.setLocalRotation({-45.0f, -45.0f, 0.0});
 
     Entity* pointLight = loader->LoadAssimp("assets/models/ball.gltf");
     pointLight->name = "lamp";
@@ -152,6 +155,7 @@ void Game::SetupScene() {
     scene->AddEntity(monkeyEntity);
     scene->AddEntity(nanosuitEntity);
     scene->AddEntity(boxEntity);
+#endif
 }
 
 void Game::AddObjectToScene(GameObject* object) {
@@ -217,9 +221,10 @@ void Game::Update(float deltaTime) {
             activeCameraEntity->transform.GetForwardDirection(),
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
-    
-        glm::mat4 projection = cam->GetProjectionMatrix(viewportWidth/windowHeight);
-        Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
+        if(windowHeight > 0) {
+            glm::mat4 projection = cam->GetProjectionMatrix(viewportWidth/windowHeight);
+            Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
+        }
     }
 }
 

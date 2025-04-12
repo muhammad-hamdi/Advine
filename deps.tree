@@ -1,4 +1,5 @@
 vendor
+├── assimp/
 ├── glad/
 │   ├── glad.h
 │   ├── KHR

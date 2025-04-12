@@ -15,7 +15,10 @@ struct LightData;
 class Scene {
 public:
     Scene();
+    Scene(std::string path);
     ~Scene();
+
+    void LoadFromFile();
 
     void AddGameObject(GameObject* obj);
     void RemoveGameObject(GameObject* obj);
@@ -55,6 +58,8 @@ private:
     LightData mainDirectionalLight;
     std::map<std::string, Camera*> cameras;  // Store cameras by name
     Camera* activeCamera = nullptr;          // The active camera
+
+    std::string filepath;
 };
 
 #endif // SCENE_H

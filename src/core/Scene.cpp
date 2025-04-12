@@ -5,16 +5,105 @@
 #include "components/Camera.h"
 #include "components/LightComponent.h"
 
+#include "json.hpp"
+
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include "Scene.h"
+
+using json = nlohmann::json;
 
 Scene::Scene() {
     // Optionally, you can initialize a default camera or other scene components.
 }
 
+Scene::Scene(std::string path): filepath(path)
+{
+    LoadFromFile();
+}
+
 Scene::~Scene() {
     // Cleanup if necessary
+}
+
+void Scene::LoadFromFile() {
+    std::ifstream f(filepath);
+    json sceneData = json::parse(f);
+
+    Model loader;
+
+    for(auto m : sceneData["entities"]) {
+        Entity* e;
+        if(m.contains("modelPath")) {
+            e = loader.LoadAssimp(m["modelPath"]);
+            e->name = m["name"];
+            entities.push_back(e);
+        } else {
+            e = CreateEntity(m["name"]);
+        }
+        if(m.contains("components")) {
+            for(auto co : m["components"]) {
+                if(co["name"] == "camera") {
+                    auto cm = e->AddComponent<CameraComponent>();
+                    if(co["isActive"]) {
+                        SetActiveCamera(e);
+                    }
+                }
+                else if (co["name"] == "light")
+                {
+                    auto lc = e->AddComponent<LightComponent>(static_cast<LightType>(co["type"]));
+                    if(co.contains("color")) {
+                        lc->color = {co["color"][0], co["color"][1], co["color"][2]};
+                    }
+                    if(co["type"] != 0) {
+                        lc->constant  = co.contains("constant")  ? static_cast<float>(co["constant"])  : 0;
+                        lc->linear    = co.contains("linear")    ? static_cast<float>(co["linear"])    : 0;
+                        lc->quadratic = co.contains("quadratic") ? static_cast<float>(co["quadratic"]) : 0;
+                    }
+                }
+            }
+        }
+        if(m.contains("position")) {
+            auto pos = m["position"];
+            if(m.contains("motionNode")) {
+                std::vector<int> sn = m["motionNode"];
+                Entity* me = e;
+                for(int i : sn) {
+                    me = me->children[i];
+                }
+                me->transform.setLocalPosition({pos[0], pos[1], pos[2]});
+            } else {
+                e->transform.setLocalPosition({pos[0], pos[1], pos[2]});
+            }
+        }
+        if(m.contains("rotation")) {
+            auto rot = m["rotation"];
+            if(m.contains("motionNode")) {
+                std::vector<int> sn = m["motionNode"];
+                Entity* me = e;
+                for(int i : sn) {
+                    me = me->children[i];
+                }
+                me->transform.setLocalRotation({rot[0], rot[1], rot[2]});
+            } else {
+                e->transform.setLocalRotation({rot[0], rot[1], rot[2]});
+            }
+        }
+        if(m.contains("scale")) {
+            auto scale = m["scale"];
+            if(m.contains("motionNode")) {
+                std::vector<int> sn = m["motionNode"];
+                Entity* me = e;
+                for(int i : sn) {
+                    me = me->children[i];
+                }
+                me->transform.setLocalScale({scale[0], scale[1], scale[2]});
+            } else {
+                e->transform.setLocalScale({scale[0], scale[1], scale[2]});
+            }
+        }
+    }
 }
 
 void Scene::AddGameObject(GameObject* obj) {
