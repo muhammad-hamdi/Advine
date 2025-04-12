@@ -21,6 +21,8 @@ UI::UI(GLFWwindow *window): window(window)
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable keyboard controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     // Setup ImGui style
     ImGui::StyleColorsDark();
@@ -87,15 +89,14 @@ void UI::ShowGameObjectEditor(Scene *scene)
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
-    int windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoTitleBar;
+    int windowFlags = ImGuiWindowFlags_HorizontalScrollbar;
 
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(imguiPanelWidth, windowHeight));
-    ImGui::Begin("Left Panel", NULL, windowFlags);
+    ImGui::Begin("Entity Tree", NULL, windowFlags);
     if(ImGui::Button("Deselect")) {
         selectedObject = nullptr;
+        selectedEntity = nullptr;
     }
-    if(ImGui::Button("New Object")) {
+    if(ImGui::Button("New Entity")) {
         printf("New Object\n");
     }
     int id = 0;
@@ -108,9 +109,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
     }
     ImGui::End();
 
-    ImGui::SetNextWindowPos(ImVec2(windowWidth - imguiPanelWidth, 0));
-    ImGui::SetNextWindowSize(ImVec2(imguiPanelWidth, windowHeight));
-    ImGui::Begin("Right Panel", NULL, windowFlags);
+    ImGui::Begin("Entity Inspector", NULL, windowFlags);
     if(selectedObject != nullptr) {
         ImGui::Text("Name");
         ImGui::SameLine();
@@ -289,4 +288,11 @@ void UI::Render()
 {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    GLFWwindow* backup_current_context = glfwGetCurrentContext();
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
 }

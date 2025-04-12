@@ -16,7 +16,7 @@
 #include <iostream>
 
 Game::Game(int winWidth, int winHeight, const char* windowTitle) 
-    : window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
+    : windowTitle(windowTitle), window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
     windowWidth = winWidth;
     windowHeight = winHeight;
     Initialize();
@@ -35,7 +35,7 @@ void Game::Initialize() {
         exit(EXIT_FAILURE);
     }
 
-    window = glfwCreateWindow(windowWidth, windowHeight, "Game", nullptr, nullptr);
+    window = glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window!" << std::endl;
         glfwTerminate();
@@ -53,9 +53,7 @@ void Game::Initialize() {
 
     glfwSetFramebufferSizeCallback(window, ResizeCallback);
 
-    viewportWidth = windowWidth - 2*UI::imguiPanelWidth;
-
-    glViewport(UI::imguiPanelWidth, 0, viewportWidth, windowHeight);
+    glViewport(0, 0, windowWidth, windowHeight);
     glEnable(GL_DEPTH_TEST);
 
     AssetManager::Init();
@@ -198,7 +196,7 @@ void Game::ResizeCallback(GLFWwindow *window, int width, int height)
     // TODO: remove this padding when we define some debug macro
     windowWidth = width;
     windowHeight = height;
-    glViewport(UI::imguiPanelWidth, 0, width - 2*UI::imguiPanelWidth, height);
+    glViewport(0, 0, width, height);
 }
 
 void Game::Update(float deltaTime) {
@@ -207,7 +205,6 @@ void Game::Update(float deltaTime) {
     // scene->GetActiveCamera()->Update(deltaTime);
 
     // TODO: move to another method
-    viewportWidth = windowWidth - 2*UI::imguiPanelWidth;
 #if 0
     camera->SetProjectionMatrix(45.0f, (float)viewportWidth/windowHeight, 0.1f, 100.0f);
     AssetManager::GetDefaultMaterial()->SetCustomUniform("viewPos", UniformValue(camera->GetPosition()), GL_FLOAT_VEC3);
@@ -222,7 +219,7 @@ void Game::Update(float deltaTime) {
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
         if(windowHeight > 0) {
-            glm::mat4 projection = cam->GetProjectionMatrix(viewportWidth/windowHeight);
+            glm::mat4 projection = cam->GetProjectionMatrix((float)windowWidth/(float)windowHeight);
             Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
         }
     }

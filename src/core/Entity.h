@@ -13,7 +13,6 @@ public:
     Entity* parent = nullptr; // Optional parent
     std::vector<Entity*> children;
 
-    // Store components
     std::vector<std::unique_ptr<Component>> components;
 
     template<typename T, typename... Args>

@@ -26,10 +26,10 @@ private:
     Camera* camera;
     UI* uiManager;
 
+    std::string windowTitle;
+
     inline static int windowWidth;
     inline static int windowHeight;
-
-    int viewportWidth;
 
     static void ResizeCallback(GLFWwindow* window, int width, int height);
 

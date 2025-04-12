@@ -8,13 +8,11 @@ set BUILD_DIR=build
 set EXECUTABLE=game.exe
 set VENDOR_DIR=../vendor
 
-set VCPKG_INCLUDE=C:\Users\PC\scoop\apps\vcpkg\2025.03.19\installed\x64-windows\include
-
 :: Create build directory if it doesn't exist
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
 :: Include paths
-set INCLUDE_FLAGS=/I"%VENDOR_DIR%" /I"%VENDOR_DIR%\imgui" /I"../src" /I%VCPKG_INCLUDE%
+set INCLUDE_FLAGS=/I"%VENDOR_DIR%" /I"%VENDOR_DIR%\imgui" /I"../src"
 
 :: GLFW library (assuming pre-built Windows version)
 set GLFW_LIB=%VENDOR_DIR%\GLFW\lib-vc2022\glfw3.lib
@@ -38,13 +36,13 @@ for %%f in (
 :: GLAD source
 set GLAD_SRC=%VENDOR_DIR%\glad\src\glad.c
 
-set LIB_PATH_1=/LIBPATH:C:\Users\PC\scoop\apps\vcpkg\2025.03.19\installed\x64-windows\lib
+set LIB_PATH=/LIBPATH:"%VENDOR_DIR%\lib"
 
 echo Compiling...
 pushd %BUILD_DIR%
 echo "%CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:../%BUILD_DIR%\%EXECUTABLE% /link %LDFLAGS%"
 
-%CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:../%BUILD_DIR%\%EXECUTABLE% /link %LIB_PATH_1% %LDFLAGS%
+%CXX% %CXXFLAGS% %INCLUDE_FLAGS% %SOURCES% %IMGUI_SOURCES% %GLAD_SRC% %GLFW_LIB% /Fe:../%BUILD_DIR%\%EXECUTABLE% /link %LIB_PATH% %LDFLAGS%
 popd
 
 if %errorlevel% equ 0 (
