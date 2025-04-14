@@ -52,4 +52,16 @@ public:
             owner->transform.position += right * 0.1f;
         }
     }
+
+    bool IsOverridden() const {
+        return true;
+    }
+
+    json Serialize() const {
+        json j;
+        j["name"] = "camera";
+        j["isActive"] = isActive;
+    
+        return j;
+    }
 };

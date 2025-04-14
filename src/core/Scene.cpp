@@ -31,16 +31,20 @@ void Scene::LoadFromFile() {
     std::ifstream f(filepath);
     json sceneData = json::parse(f);
 
+    name = sceneData["name"];
+
     Model loader;
 
     for(auto m : sceneData["entities"]) {
         Entity* e;
         if(m.contains("modelPath")) {
             e = loader.LoadAssimp(m["modelPath"]);
+            e->modelPath = m["modelPath"];
             e->name = m["name"];
             entities.push_back(e);
         } else {
             e = CreateEntity(m["name"]);
+            e->source = 1;
         }
         if(m.contains("components")) {
             for(auto co : m["components"]) {
@@ -106,6 +110,54 @@ void Scene::LoadFromFile() {
     }
 }
 
+json Scene::SerializeEntities(const std::vector<Entity*>& entities) {
+    json arr = json::array();
+    for (auto* e : entities) {
+        json entityJson;
+        entityJson["name"] = e->name;
+        if(e->HasTransformOverride()) {
+            auto t = e->transform;
+            entityJson["position"] = {t.position.x, t.position.y, t.position.z};
+            entityJson["rotation"] = {t.eulerRotation.x, t.eulerRotation.y, t.eulerRotation.z};
+            entityJson["scale"]    = {t.scale.x, t.scale.y, t.scale.z};
+        }
+
+        if (!e->components.empty()) {
+            entityJson["components"] = json::array();
+            for (auto& c : e->components) {
+                if(c->IsOverridden()) {
+                    entityJson["components"].push_back(c->Serialize());
+                }
+            }
+        }
+
+        if(e->source == 0) {
+            entityJson["modelPath"] = e->modelPath;
+            std::vector<json> overrides;
+            e->GatherOverrides(overrides, {});
+            if (!overrides.empty()) {
+                entityJson["overrides"] = overrides;
+            }
+        } else {
+            if (!e->children.empty()) {
+                entityJson["children"] = SerializeEntities(e->children);
+            }
+        }
+        arr.push_back(entityJson);
+    }
+    return arr;
+}
+
+void Scene::SaveToFile() {
+    std::string file = "assets/scenes/" + name + ".json";
+    json sceneJson;
+    sceneJson["name"] = name;
+    sceneJson["entities"] = SerializeEntities(entities);
+
+    std::ofstream out(file);
+    out << sceneJson.dump(4);
+}
+
 void Scene::AddGameObject(GameObject* obj) {
     gameObjects.push_back(obj);
 }
@@ -160,12 +212,6 @@ Camera *Scene::GetActiveCamera() const
 void Scene::Update(float deltaTime)
 {
     // Here, we could update GameObjects for things like physics, animation, etc.
-    // for (const auto& obj : gameObjects) {
-    //     // For each GameObject, we can update its state
-    //     // For example, applying movement, handling input, etc.
-    //     obj->Update(deltaTime);
-    // }
-
     for (const auto& entity : entities) {
         entity->Update(deltaTime);
     }

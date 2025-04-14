@@ -92,12 +92,22 @@ void UI::ShowGameObjectEditor(Scene *scene)
     int windowFlags = ImGuiWindowFlags_HorizontalScrollbar;
 
     ImGui::Begin("Entity Tree", NULL, windowFlags);
+
+    ImGui::RadioButton("Editor", &Game::state, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("Game", &Game::state, 1);
+
     if(ImGui::Button("Deselect")) {
         selectedObject = nullptr;
         selectedEntity = nullptr;
     }
+    ImGui::SameLine();
     if(ImGui::Button("New Entity")) {
         printf("New Object\n");
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Save Scene")) {
+        scene->SaveToFile();
     }
     int id = 0;
     for (auto& obj : gameObjects) {
@@ -179,7 +189,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
 
         for(auto &comp : selectedEntity->components) {
             ImGui::Separator();
-            if(Camera* camera = dynamic_cast<Camera*>(comp.get())) {
+            if(CameraComponent* camera = dynamic_cast<CameraComponent*>(comp.get())) {
                 // do camera stuff, maybe skybox cubemap
             }
             else if(LightComponent* lc = dynamic_cast<LightComponent*>(comp.get())) {

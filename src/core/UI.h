@@ -3,6 +3,7 @@
 #include "core/Entity.h"
 
 struct GLFWwindow;
+class Game;
 
 class UI {
 public:

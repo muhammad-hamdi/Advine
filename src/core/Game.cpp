@@ -16,7 +16,7 @@
 #include <iostream>
 
 Game::Game(int winWidth, int winHeight, const char* windowTitle) 
-    : windowTitle(windowTitle), window(nullptr), scene(nullptr), camera(nullptr), uiManager(nullptr) {
+    : windowTitle(windowTitle), window(nullptr), scene(nullptr), editorCamera(nullptr), uiManager(nullptr) {
     windowWidth = winWidth;
     windowHeight = winHeight;
     Initialize();
@@ -34,6 +34,7 @@ void Game::Initialize() {
         std::cerr << "Failed to initialize GLFW!" << std::endl;
         exit(EXIT_FAILURE);
     }
+    glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
     window = glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), nullptr, nullptr);
     if (!window) {
@@ -53,6 +54,7 @@ void Game::Initialize() {
 
     glfwSetFramebufferSizeCallback(window, ResizeCallback);
 
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
     glViewport(0, 0, windowWidth, windowHeight);
     glEnable(GL_DEPTH_TEST);
 
@@ -61,50 +63,11 @@ void Game::Initialize() {
 
     uiManager = new UI(window);
     scene = new Scene();
+    editorCamera = new Camera(60.0f, (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
     SetupScene();
 }
 
 void Game::SetupScene() {
-#if 0
-    // Setup camera (perspective, position, etc.)
-    camera = new Camera(45.0f, (float)viewportWidth / windowHeight, 0.1f, 100.0f);
-    scene->AddCamera("MainCamera", camera);
-    scene->SetActiveCamera("MainCamera");
-
-    Model* box = AssetManager::LoadModel("box", "assets/models/cube.gltf");
-    Model* model = AssetManager::LoadModel("monkey", "assets/models/monkey.gltf");
-    Model* modelTextured = AssetManager::LoadModel("monkey_textured", "assets/models/monkey_textured.gltf");
-
-    box->SetMaterial(AssetManager::GetDefaultMaterial());
-
-    AssetManager::GetDefaultMaterial()->SetCustomUniform("objectColor", UniformValue(glm::vec3(1.0)), GL_FLOAT_VEC3);
-
-    // Create GameObject(s)
-    GameObject* obj1 = new GameObject();
-    obj1->SetModel(box);  // Set the loaded model
-    // obj1->SetScale(glm::vec3(1.0, 2.0, 1.0));
-    obj1->SetPosition(glm::vec3(-3.0f, 0.0f, -5.0f));
-
-    GameObject* obj2 = new GameObject();
-    obj2->SetModel(modelTextured);  // Set the same model or a different one
-    obj2->SetPosition(glm::vec3(3.0f, 0.0f, -5.0f));
-
-    GameObject* obj3 = new GameObject();
-    obj3->SetModel(modelTextured);
-    obj3->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
-    obj3->SetMaterial(AssetManager::LoadMaterial("scroll_tex", "assets/shaders/default.vert", "assets/shaders/scrolling_tex.frag", "assets/textures/ss.png"));
-
-    GameObject* ground = new GameObject();
-    ground->SetModel(box);
-    ground->SetPosition(glm::vec3(0.0f, -5.0f, 0.0f));
-    ground->SetScale(glm::vec3(10.0, 0.2, 10.0));
-
-    scene->AddGameObject(obj1);
-    scene->AddGameObject(obj2);
-    scene->AddGameObject(obj3);
-    scene->AddGameObject(ground);
-#endif
-
     scene = new Scene("assets/scenes/testing.json");
 
 #if 0
@@ -182,9 +145,8 @@ void Game::Run() {
 
 void Game::ProcessInput(float deltaTime) {
     Input::Update();
-    // Other input handling (camera movement, etc.) can be added here.
     if (Input::IsMousePressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-        Input::SetMouseCaptured(true); // Capture the mouse
+        Input::SetMouseCaptured(true);
     }
     if(Input::IsKeyPressed(GLFW_KEY_Q)) {
         Input::SetMouseCaptured(false);
@@ -193,7 +155,6 @@ void Game::ProcessInput(float deltaTime) {
 
 void Game::ResizeCallback(GLFWwindow *window, int width, int height)
 {
-    // TODO: remove this padding when we define some debug macro
     windowWidth = width;
     windowHeight = height;
     glViewport(0, 0, width, height);
@@ -201,34 +162,35 @@ void Game::ResizeCallback(GLFWwindow *window, int width, int height)
 
 void Game::Update(float deltaTime) {
     fps = 1/deltaTime;
-    scene->Update(deltaTime);
-    // scene->GetActiveCamera()->Update(deltaTime);
-
-    // TODO: move to another method
-#if 0
-    camera->SetProjectionMatrix(45.0f, (float)viewportWidth/windowHeight, 0.1f, 100.0f);
-    AssetManager::GetDefaultMaterial()->SetCustomUniform("viewPos", UniformValue(camera->GetPosition()), GL_FLOAT_VEC3);
-#endif
-
-    Entity* activeCameraEntity = scene->GetActiveCameraEntity();
-    if (activeCameraEntity) {
-        auto* cam = activeCameraEntity->GetComponent<CameraComponent>();
-        glm::mat4 view = cam->GetViewMatrix(
-            activeCameraEntity->GetWorldPosition(),
-            activeCameraEntity->transform.GetForwardDirection(),
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
+    if(state == State::Editor) {
+        editorCamera->Update(deltaTime);
         if(windowHeight > 0) {
-            glm::mat4 projection = cam->GetProjectionMatrix((float)windowWidth/(float)windowHeight);
-            Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
+            editorCamera->SetProjectionMatrix(45.0f, (float)windowWidth/windowHeight, 0.1f, 100.0f);
+            Renderer::SetViewProjection(editorCamera->GetViewMatrix(), editorCamera->GetProjectionMatrix(), editorCamera->GetPosition());
+        }
+    }
+    else if(state == State::InGame) {
+        scene->Update(deltaTime);
+
+        Entity* activeCameraEntity = scene->GetActiveCameraEntity();
+        if (activeCameraEntity) {
+            auto* cam = activeCameraEntity->GetComponent<CameraComponent>();
+            glm::mat4 view = cam->GetViewMatrix(
+                activeCameraEntity->GetWorldPosition(),
+                activeCameraEntity->transform.GetForwardDirection(),
+                glm::vec3(0.0f, 1.0f, 0.0f)
+            );
+            if(windowHeight > 0) {
+                glm::mat4 projection = cam->GetProjectionMatrix((float)windowWidth/(float)windowHeight);
+                Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
+            }
         }
     }
 }
 
 void Game::Render() {
-    // Renderer::RenderScene(*scene, *scene->GetActiveCamera());
     Renderer::RenderScene(*scene);
-    
+
     uiManager->StartFrame();
     uiManager->ShowGameObjectEditor(scene);
     uiManager->Render();

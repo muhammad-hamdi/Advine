@@ -64,19 +64,19 @@ const glm::vec3& Transform::getLocalScale()
 void Transform::setLocalPosition(const glm::vec3& newPosition)
 {
     position = newPosition;
-    dirty = true;
+    positionOverridden = true;
 }
 
 void Transform::setLocalRotation(const glm::vec3& newRotation)
 {
     eulerRotation = newRotation;
-    dirty = true;
+    rotationOverridden = true;
 }
 
 void Transform::setLocalScale(const glm::vec3& newScale)
 {
     scale = newScale;
-    dirty = true;
+    scaleOverridden = true;
 }
 
 const glm::mat4& Transform::getModelMatrix()

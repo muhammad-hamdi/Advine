@@ -20,6 +20,10 @@ public:
 
     void LoadFromFile();
 
+    json SerializeEntities(const std::vector<Entity *> &entities);
+
+    void SaveToFile();
+
     void AddGameObject(GameObject* obj);
     void RemoveGameObject(GameObject* obj);
 
@@ -60,6 +64,7 @@ private:
     Camera* activeCamera = nullptr;          // The active camera
 
     std::string filepath;
+    std::string name;
 };
 
 #endif // SCENE_H

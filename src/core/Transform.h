@@ -13,6 +13,10 @@ public:
     glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
     glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
 
+    bool positionOverridden = false;
+    bool rotationOverridden = false;
+    bool scaleOverridden    = false;
+
 private:
     //Global space information concatenate in matrix
     glm::mat4 modelMatrix = glm::mat4(1.0f);

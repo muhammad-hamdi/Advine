@@ -5,6 +5,11 @@
 #include "core/GameObject.h"
 #include <GLFW/glfw3.h>
 
+enum State {
+    Editor,
+    InGame
+};
+
 class Game {
 public:
     Game(int windowWidth, int windowHeight, const char* windowTitle);
@@ -13,6 +18,7 @@ public:
     void Run();
     void AddObjectToScene(GameObject* object);
     void SetActiveCamera(const std::string& name);
+    inline static int state = State::Editor;
 
 private:
     void Initialize();
@@ -23,7 +29,7 @@ private:
 
     GLFWwindow* window;
     Scene* scene;
-    Camera* camera;
+    Camera* editorCamera;
     UI* uiManager;
 
     std::string windowTitle;
