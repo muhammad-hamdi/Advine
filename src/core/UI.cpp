@@ -103,7 +103,14 @@ void UI::ShowGameObjectEditor(Scene *scene)
     }
     ImGui::SameLine();
     if(ImGui::Button("New Entity")) {
-        printf("New Object\n");
+        Entity* entitiy = new Entity();
+        entitiy->name = "New Entity";
+        if(selectedEntity != nullptr) {
+            selectedEntity->children.push_back(entitiy);
+            entitiy->parent = selectedEntity;
+        } else {
+            scene->AddEntity(entitiy);
+        }
     }
     ImGui::SameLine();
     if(ImGui::Button("Save Scene")) {
@@ -191,9 +198,27 @@ void UI::ShowGameObjectEditor(Scene *scene)
             ImGui::Separator();
             if(CameraComponent* camera = dynamic_cast<CameraComponent*>(comp.get())) {
                 // do camera stuff, maybe skybox cubemap
+                if(ImGui::TreeNode("Camera Component")) {
+                    ImGui::SliderFloat("fov", &camera->fov, 10.f, 179.f);
+                    ImGui::Checkbox("Main Camera", &camera->isActive);
+                }
             }
             else if(LightComponent* lc = dynamic_cast<LightComponent*>(comp.get())) {
                 if(ImGui::TreeNode("Light Component")) {
+                    char* types[3] = {
+                        "Directional Light",
+                        "Point Light",
+                        "Spot Light"
+                    };
+                    if(ImGui::BeginCombo("Type", types[static_cast<int>(lc->type)])) {
+                        for(int i = 0; i < 3; i++) {
+                            auto type = types[i];
+                            if(ImGui::Selectable(type, i == static_cast<int>(lc->type))) {
+                                lc->type = static_cast<LightType>(i);
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
                     ImGui::ColorEdit3("Color", &lc->color[0]);
                     ImGui::SliderFloat("Intensity", &lc->intensity, 0.f, 1.0f);
                     if(lc->type != LightType::Directional) {
@@ -236,6 +261,20 @@ void UI::ShowGameObjectEditor(Scene *scene)
                     ImGui::TreePop();
                 }
             }
+        }
+
+        if (ImGui::Button("Add Component"))
+            ImGui::OpenPopup("component_popup");
+        if (ImGui::BeginPopup("component_popup")) {
+            ImGui::MenuItem("(demo menu)", NULL, false, false);
+            // if (ImGui::MenuItem("MeshRenderer")) {}
+            if (ImGui::MenuItem("Light")) {
+                selectedEntity->AddComponent<LightComponent>(LightType::Point);
+            }
+            if (ImGui::MenuItem("Camera")) {
+                selectedEntity->AddComponent<CameraComponent>();
+            }
+            ImGui::EndPopup();
         }
     }
 

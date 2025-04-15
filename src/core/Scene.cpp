@@ -15,7 +15,6 @@
 using json = nlohmann::json;
 
 Scene::Scene() {
-    // Optionally, you can initialize a default camera or other scene components.
 }
 
 Scene::Scene(std::string path): filepath(path)
@@ -24,7 +23,6 @@ Scene::Scene(std::string path): filepath(path)
 }
 
 Scene::~Scene() {
-    // Cleanup if necessary
 }
 
 void Scene::LoadFromFile() {
@@ -197,7 +195,6 @@ void Scene::AddEntity(Entity *entity)
     entities.push_back(entity);
 }
 
-// Set the active camera by name
 void Scene::SetActiveCamera(const std::string& name) {
     if (cameras.find(name) != cameras.end()) {
         activeCamera = cameras[name];
@@ -211,7 +208,6 @@ Camera *Scene::GetActiveCamera() const
 
 void Scene::Update(float deltaTime)
 {
-    // Here, we could update GameObjects for things like physics, animation, etc.
     for (const auto& entity : entities) {
         entity->Update(deltaTime);
     }
@@ -228,6 +224,7 @@ const std::vector<Entity *> &Scene::GetEntities() const
 
 void Scene::GatherLights(std::vector<LightData>& lightsOut) {
     for (Entity* entity : entities) {
+        GetChildLights(entity->children, lightsOut);
         auto* light = entity->GetComponent<LightComponent>();
         if (!light) continue;
 
@@ -244,8 +241,29 @@ void Scene::GatherLights(std::vector<LightData>& lightsOut) {
         data.castShadows = light->castShadows;
 
         lightsOut.push_back(data);
-
         if (light->type == LightType::Directional && light->isMainDirectional)
             mainDirectionalLight = data;
+    }
+}
+
+void Scene::GetChildLights(std::vector<Entity*>& children, std::vector<LightData>& lightsOut) {
+    for (Entity* entity : children) {
+        GetChildLights(entity->children, lightsOut);
+        auto* light = entity->GetComponent<LightComponent>();
+        if (!light) continue;
+
+        LightData data;
+        data.type = static_cast<int>(light->type);
+        data.color = light->color * light->intensity;
+        data.position = entity->GetWorldPosition();
+        data.direction = entity->transform.GetForwardDirection();
+        data.range = light->range;
+        data.constant = light->constant;
+        data.linear = light->linear;
+        data.quadratic = light->quadratic;
+        data.spotAngle = light->spotAngle;
+        data.castShadows = light->castShadows;
+
+        lightsOut.push_back(data);
     }
 }

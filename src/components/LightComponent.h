@@ -40,11 +40,11 @@ struct LightComponent : public Component {
         j["color"] = { color.r, color.g, color.b };
         j["intensity"] = intensity;
 
-        j["spotAngle"] = spotAngle;
-
-        j["range"] = range;
+        if(type == LightType::Spot)
+            j["spotAngle"] = spotAngle;
 
         if (type != LightType::Directional) {
+            j["range"] = range;
             j["constant"]  = constant;
             j["linear"]    = linear;
             j["quadratic"] = quadratic;

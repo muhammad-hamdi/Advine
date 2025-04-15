@@ -55,6 +55,8 @@ public:
 
     void GatherLights(std::vector<LightData> &lightsOut);
 
+    void GetChildLights(std::vector<Entity *> &children, std::vector<LightData> &lightsOut);
+
 private:
     std::vector<GameObject*> gameObjects;
     std::vector<Entity*> entities;
