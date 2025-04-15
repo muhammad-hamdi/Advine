@@ -20,6 +20,20 @@ union UniformValue {
     UniformValue(glm::mat4 m4) : m4(m4) {}
 };
 
+/*
+// TODO: offline material assets (e.g. "shiny_material.mat")
+// structure in scene data
+"components": [
+  {
+    "name": "meshRenderer",
+    "materialOverrides": {
+      "0": "assets/materials/wood.mat",
+      "2": "assets/materials/shiny_material.mat"
+    }
+  }
+]
+*/
+
 class Material {
 public:
     std::string name;

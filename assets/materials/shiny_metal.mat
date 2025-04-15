@@ -1,0 +1,23 @@
+{
+    "shader": {
+        "vertex": "assets/shaders/default.vert",
+        "fragment": "assets/shaders/default.frag"
+    },
+    "textures": {
+        "diffuse": "assets/textures/diffuse.png",
+        "specular": "assets/textures/specular.png"
+    },
+    "properties": {
+        "diffuseColor": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "specularColor": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "shininess": 32.0
+    }
+}

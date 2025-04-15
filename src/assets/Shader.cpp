@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <unordered_set>
 
 Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
     // Load shaders
@@ -28,15 +30,8 @@ Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentS
 }
 
 GLuint Shader::LoadShader(const std::string& path, GLenum shaderType) {
-    // Read shader file
-    std::ifstream shaderFile(path);
-    if (!shaderFile.is_open()) {
-        std::cerr << "Failed to open shader file: " << path << std::endl;
-        return 0;
-    }
-    std::stringstream shaderStream;
-    shaderStream << shaderFile.rdbuf();
-    std::string shaderCode = shaderStream.str();
+    std::unordered_set<std::string> included;
+    std::string shaderCode = Preprocess(path, included);
 
     // Compile shader
     GLuint shader = glCreateShader(shaderType);
@@ -72,6 +67,53 @@ bool Shader::IsStandardUniform(const std::string &name) const
 {
     return name == "model" || name == "view" || name == "projection";
 }
+
+std::string Shader::ExtractPathFromInclude(const std::string& include) {
+    int s = 0, e = 0;
+    for(int i = 0; i < include.size(); i++) {
+        if(s == 0) {
+            if(include[i] == '"' || include[i] == '<') {
+                s = i+1;
+            }
+        } else {
+            if(include[i] == '"' || include[i] == '>') {
+                e = i;
+            }
+        }
+    }
+    std::string path = include.substr(s, e-s);
+    return path;
+}
+
+std::string Shader::Preprocess(const std::string& path, std::unordered_set<std::string>& included) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open shader file: " << path << std::endl;
+        return 0;
+    }
+
+    std::stringstream output;
+    std::string line;
+    std::string dir = std::filesystem::path(path).parent_path().string();
+
+    while (std::getline(file, line)) {
+        if (line.rfind("#include", 0) == 0) {
+            std::string includePath = ExtractPathFromInclude(line); // e.g. from #include "common.glsl"
+            std::string fullPath = dir + "/" + includePath;
+
+            // Avoid recursive includes
+            if (included.count(fullPath)) continue;
+            included.insert(fullPath);
+
+            output << Preprocess(fullPath, included) << "\n";
+        } else {
+            output << line << "\n";
+        }
+    }
+
+    return output.str();
+}
+
 
 void Shader::ApplyGlobalUniforms()
 {

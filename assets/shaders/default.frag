@@ -1,26 +1,10 @@
 #version 450 core
-
-#define MAX_LIGHTS 16
+#include "engine_uniforms.glsl"
 
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
 
-struct Light {
-    int type;             // 0 = Directional, 1 = Point, 2 = Spot
-    vec3 color;
-    vec3 position;        // For point and spot lights
-    float range;          // Attenuation range
-    float constant;
-    float linear;
-    float quadratic;
-    vec3 direction;       // For directional and spot lights
-    float spotAngle;      // In radians for spot lights
-    int castShadows;
-};
-
-uniform Light u_Lights[MAX_LIGHTS];
-uniform int u_LightCount;
 uniform int u_IsLit;
 
 uniform sampler2D u_DiffuseTexture1;
@@ -29,7 +13,6 @@ uniform sampler2D u_DiffuseTexture3;
 uniform sampler2D u_SpecularTexture1;
 uniform sampler2D u_SpecularTexture2;
 
-uniform vec3 u_CameraPos;
 uniform vec3 u_ObjectColor = vec3(0.8); // used if no texture
 uniform float u_SpecularStrength = 0.8;
 

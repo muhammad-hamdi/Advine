@@ -9,8 +9,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 struct UniformInfo {
     std::string name;
@@ -39,7 +40,8 @@ private:
     void CheckShaderCompilation(GLuint shader, const std::string& shaderType);
     void CheckProgramLinking();
     bool IsStandardUniform(const std::string& name) const;
+    std::string ExtractPathFromInclude(const std::string &include);
+    std::string Preprocess(const std::string &path, std::unordered_set<std::string> &included);
 };
-
 
 #endif
