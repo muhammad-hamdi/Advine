@@ -68,7 +68,7 @@ void Game::Initialize() {
 }
 
 void Game::SetupScene() {
-    scene = new Scene("assets/scenes/testing.json");
+    scene = new Scene("assets/scenes/Testing_Scene.json");
 
 #if 0
     Model* loader = new Model();

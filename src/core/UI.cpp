@@ -105,6 +105,7 @@ void UI::ShowGameObjectEditor(Scene *scene)
     if(ImGui::Button("New Entity")) {
         Entity* entitiy = new Entity();
         entitiy->name = "New Entity";
+        entitiy->source = 1;
         if(selectedEntity != nullptr) {
             selectedEntity->children.push_back(entitiy);
             entitiy->parent = selectedEntity;

@@ -38,7 +38,7 @@
                     "position": [
                         0.0,
                         0.0,
-                        3.0
+                        0.0
                     ],
                     "rotation": [
                         0.0,
@@ -69,6 +69,43 @@
             ]
         },
         {
+            "children": [
+                {
+                    "components": [
+                        {
+                            "color": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "constant": 0.0,
+                            "intensity": 1.0,
+                            "linear": 0.09000000357627869,
+                            "name": "light",
+                            "quadratic": 0.03200000151991844,
+                            "range": 10.0,
+                            "spotAngle": 0.4712388813495636,
+                            "type": 2
+                        }
+                    ],
+                    "name": "Light",
+                    "position": [
+                        0.0,
+                        3.0,
+                        0.0
+                    ],
+                    "rotation": [
+                        -90.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            ],
             "components": [],
             "modelPath": "assets/models/monkey_textured.gltf",
             "name": "monkey",
@@ -142,8 +179,6 @@
                     ],
                     "intensity": 1.0,
                     "name": "light",
-                    "range": 10.0,
-                    "spotAngle": 0.5235987901687622,
                     "type": 0
                 }
             ],
@@ -178,7 +213,6 @@
                     "name": "light",
                     "quadratic": 0.03200000151991844,
                     "range": 10.0,
-                    "spotAngle": 0.5235987901687622,
                     "type": 1
                 }
             ],

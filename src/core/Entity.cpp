@@ -61,6 +61,8 @@ void Entity::GatherOverrides(std::vector<json>& overridesOut, const std::vector<
     for (size_t i = 0; i < children.size(); ++i) {
         std::vector<int> childPath = path;
         childPath.push_back(static_cast<int>(i));
-        children[i]->GatherOverrides(overridesOut, childPath);
+        if(children[i]->source == 0) {
+            children[i]->GatherOverrides(overridesOut, childPath);
+        }
     }
 }

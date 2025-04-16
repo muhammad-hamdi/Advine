@@ -15,6 +15,7 @@ public:
     std::string name;
     std::string modelPath;
     int source = 0; // 0: model, 1: editor
+    bool isModelRoot = false;
     Transform transform; // Local transform
     Entity* parent = nullptr; // Optional parent
     std::vector<Entity*> children;

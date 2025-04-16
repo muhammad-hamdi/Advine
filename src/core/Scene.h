@@ -6,10 +6,13 @@
 #include "core/Entity.h"
 #include "rendering/LightData.h"
 
+#include "json.hpp"
+
 #include <map>
 #include <vector>
 #include <memory>
 
+using json = nlohmann::json;
 struct LightData;
 
 class Scene {
@@ -17,6 +20,8 @@ public:
     Scene();
     Scene(std::string path);
     ~Scene();
+
+    std::vector<Entity *> LoadEntitesFromJson(json jsonEntities, Model &loader, Entity *parent);
 
     void LoadFromFile();
 

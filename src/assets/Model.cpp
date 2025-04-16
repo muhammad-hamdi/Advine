@@ -178,6 +178,7 @@ Entity *Model::LoadAssimp(const std::string& path) {
 
     std::filesystem::path baseDir = std::filesystem::path(path).parent_path();
     Entity* rootEntity = ProcessNode(scene->mRootNode, scene, baseDir);
+    rootEntity->isModelRoot = true;
     return rootEntity;
 }
 

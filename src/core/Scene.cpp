@@ -5,14 +5,11 @@
 #include "components/Camera.h"
 #include "components/LightComponent.h"
 
-#include "json.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 #include "Scene.h"
 
-using json = nlohmann::json;
 
 Scene::Scene() {
 }
@@ -25,15 +22,9 @@ Scene::Scene(std::string path): filepath(path)
 Scene::~Scene() {
 }
 
-void Scene::LoadFromFile() {
-    std::ifstream f(filepath);
-    json sceneData = json::parse(f);
-
-    name = sceneData["name"];
-
-    Model loader;
-
-    for(auto m : sceneData["entities"]) {
+std::vector<Entity*> Scene::LoadEntitesFromJson(json jsonEntities, Model& loader, Entity* parent) {
+    std::vector<Entity*> entityList;
+    for(auto m : jsonEntities) {
         Entity* e;
         if(m.contains("modelPath")) {
             e = loader.LoadAssimp(m["modelPath"]);
@@ -44,6 +35,12 @@ void Scene::LoadFromFile() {
             e = CreateEntity(m["name"]);
             e->source = 1;
         }
+
+        if(parent) {
+            parent->children.push_back(e);
+            e->parent = parent;
+        }
+
         if(m.contains("components")) {
             for(auto co : m["components"]) {
                 if(co["name"] == "camera") {
@@ -58,59 +55,89 @@ void Scene::LoadFromFile() {
                     if(co.contains("color")) {
                         lc->color = {co["color"][0], co["color"][1], co["color"][2]};
                     }
+                    lc->intensity = co.contains("intensity") ? static_cast<float>(co["intensity"]) : 1;
+                    lc->range = co.contains("range") ? static_cast<float>(co["range"]) : 10;
                     if(co["type"] != 0) {
                         lc->constant  = co.contains("constant")  ? static_cast<float>(co["constant"])  : 0;
                         lc->linear    = co.contains("linear")    ? static_cast<float>(co["linear"])    : 0;
                         lc->quadratic = co.contains("quadratic") ? static_cast<float>(co["quadratic"]) : 0;
+                        lc->spotAngle = co.contains("spotAngle") ? static_cast<float>(co["spotAngle"]) : 30;
                     }
                 }
             }
         }
+
         if(m.contains("position")) {
             auto pos = m["position"];
-            if(m.contains("motionNode")) {
-                std::vector<int> sn = m["motionNode"];
-                Entity* me = e;
-                for(int i : sn) {
-                    me = me->children[i];
-                }
-                me->transform.setLocalPosition({pos[0], pos[1], pos[2]});
-            } else {
-                e->transform.setLocalPosition({pos[0], pos[1], pos[2]});
-            }
+            e->transform.setLocalPosition({pos[0], pos[1], pos[2]});
         }
         if(m.contains("rotation")) {
             auto rot = m["rotation"];
-            if(m.contains("motionNode")) {
-                std::vector<int> sn = m["motionNode"];
-                Entity* me = e;
-                for(int i : sn) {
-                    me = me->children[i];
-                }
-                me->transform.setLocalRotation({rot[0], rot[1], rot[2]});
-            } else {
-                e->transform.setLocalRotation({rot[0], rot[1], rot[2]});
-            }
+            e->transform.setLocalRotation({rot[0], rot[1], rot[2]});
         }
         if(m.contains("scale")) {
             auto scale = m["scale"];
-            if(m.contains("motionNode")) {
-                std::vector<int> sn = m["motionNode"];
+            e->transform.setLocalScale({scale[0], scale[1], scale[2]});
+        }
+
+        if(m.contains("children")) {
+            LoadEntitesFromJson(m["children"], loader, e);
+        }
+
+        if(m.contains("overrides")) {
+            for(auto ovr: m["overrides"]) {
                 Entity* me = e;
-                for(int i : sn) {
+                auto path = ovr["path"];
+                for(int i : path) {
                     me = me->children[i];
                 }
-                me->transform.setLocalScale({scale[0], scale[1], scale[2]});
-            } else {
-                e->transform.setLocalScale({scale[0], scale[1], scale[2]});
+
+                if(ovr.contains("position")) {
+                    auto pos = ovr["position"];
+                    me->transform.setLocalPosition({pos[0], pos[1], pos[2]});
+                }
+                if(ovr.contains("rotation")) {
+                    auto rot = ovr["rotation"];
+                    me->transform.setLocalRotation({rot[0], rot[1], rot[2]});
+                }
+                if(ovr.contains("scale")) {
+                    auto scale = ovr["scale"];
+                    me->transform.setLocalScale({scale[0], scale[1], scale[2]});
+                }
             }
         }
+        entityList.push_back(e);
     }
+    return entityList;
+}
+
+void Scene::LoadFromFile() {
+    std::ifstream f(filepath);
+    json sceneJson = json::parse(f);
+    name = sceneJson["name"];
+
+    Model loader;
+
+    entities = LoadEntitesFromJson(sceneJson["entities"], loader, nullptr);
+}
+
+bool HasAuthoredDescendant(Entity* entity) {
+    for (auto* child : entity->children) {
+        if (child->source == 1 || HasAuthoredDescendant(child)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 json Scene::SerializeEntities(const std::vector<Entity*>& entities) {
     json arr = json::array();
     for (auto* e : entities) {
+        bool isInternalModelEntity = e->source == 0 && !e->isModelRoot;
+        if (isInternalModelEntity && !HasAuthoredDescendant(e)) {
+            continue;
+        }
+
         json entityJson;
         entityJson["name"] = e->name;
         if(e->HasTransformOverride()) {
@@ -129,18 +156,20 @@ json Scene::SerializeEntities(const std::vector<Entity*>& entities) {
             }
         }
 
-        if(e->source == 0) {
+        if(e->isModelRoot) {
             entityJson["modelPath"] = e->modelPath;
             std::vector<json> overrides;
             e->GatherOverrides(overrides, {});
             if (!overrides.empty()) {
                 entityJson["overrides"] = overrides;
             }
-        } else {
-            if (!e->children.empty()) {
-                entityJson["children"] = SerializeEntities(e->children);
-            }
         }
+
+        json childrenJson = SerializeEntities(e->children);
+        if (!childrenJson.empty()) {
+            entityJson["children"] = childrenJson;
+        }
+
         arr.push_back(entityJson);
     }
     return arr;
