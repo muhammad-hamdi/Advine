@@ -14,7 +14,6 @@
 class Model {
 public:
     void Draw();
-    void LoadGLTF(const std::string& path);
 
     std::vector<Mesh> GetMeshes() { return meshes; }
     void SetMaterial(Material *mat);

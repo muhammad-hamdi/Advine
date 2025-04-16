@@ -75,5 +75,10 @@
         "*.def": "cpp",
         "*.inc": "cpp"
     },
-    "C_Cpp.default.compilerPath": "C:/msys64/mingw64/bin/g++.exe"
+    "cmake.debugConfig": {
+        "cwd": "${workspaceFolder}"
+    },
+    "cmake.configureEnvironment": {
+        "cwd": "${workspaceFolder}"
+    }
 }

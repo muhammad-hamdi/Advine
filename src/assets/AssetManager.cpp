@@ -11,11 +11,12 @@ void AssetManager::Init() {
 }
 
 Model* AssetManager::LoadModel(const std::string& name, const std::string& path) {
+    // TODO: rewrite to use new load or retire completely
     auto it = models.find(name);
     if (it != models.end()) return it->second.get();
 
     auto model = std::make_unique<Model>();
-    model->LoadGLTF(path);
+    // model->LoadGLTF(path);
     models[name] = std::move(model);
     return models[name].get();
 }

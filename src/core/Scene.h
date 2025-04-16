@@ -6,7 +6,7 @@
 #include "core/Entity.h"
 #include "rendering/LightData.h"
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #include <map>
 #include <vector>
