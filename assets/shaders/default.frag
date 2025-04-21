@@ -42,21 +42,21 @@ vec3 CalculateSpotLight(Light light, vec3 normal, vec3 viewDir, vec3 diffuseColo
     vec3 lightDir = normalize(light.position - FragPos);
     float distance = length(light.position - FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
-    attenuation *= (distance <= light.range) ? 1.0 : 0.0;  // Apply range to attenuation
+    // attenuation *= (distance <= light.range) ? 1.0 : 0.0;  // Apply range to attenuation
 
     // Calculate spotlight effect using spotAngle
     float theta = dot(lightDir, normalize(-light.direction)); // Dot between light direction and fragment direction
     // float spotFactor = smoothstep(cos(light.spotAngle), 1.0, theta); // Apply spot angle to get soft edge of cone
 
-    // vec3 diffuse = max(dot(normal, -lightDir), 0.0) * light.color * diffuseColor * attenuation * spotFactor;
+    // vec3 diffuse = max(dot(normal, lightDir), 0.0) * light.color * diffuseColor * attenuation * spotFactor;
     // vec3 specular = pow(max(dot(reflect(-lightDir, normal), viewDir), 0.0), 32.0) * specularColor * attenuation * spotFactor * light.color * u_SpecularStrength;
+    // return diffuse + specular;
 
     if(theta > cos(light.spotAngle)) {
         vec3 diffuse = max(dot(normal, lightDir), 0.0) * light.color * diffuseColor * attenuation;
         vec3 specular = pow(max(dot(reflect(-lightDir, normal), viewDir), 0.0), 32.0) * specularColor * attenuation * light.color * u_SpecularStrength;
-    return diffuse + specular;
+        return diffuse + specular;
     }
-
 }
 
 vec3 CalculateLight(vec3 finalColor, vec3 diffuseColor, vec3 specularColor) {

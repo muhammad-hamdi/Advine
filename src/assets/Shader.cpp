@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_set>
+#include <filesystem>
 
 Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
     // Load shaders
