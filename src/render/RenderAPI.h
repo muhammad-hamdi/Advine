@@ -4,17 +4,17 @@
 #include <vector>
 #include <string>
 
+#include "BufferLayout.h"
+
 namespace ae
 {
     using GPUHandle = uint32_t;
-
-    struct BufferElementFormat;
 
     class RenderAPI
     {
     public:
         // === Buffers ===
-        virtual GPUHandle CreateVertexDescription(std::vector<BufferElementFormat> layout) = 0;
+        virtual GPUHandle CreateVertexDescription(const BufferLayout& layout) = 0;
         virtual GPUHandle CreateVertexBuffer(uint32_t size, const void* data) = 0;
         virtual GPUHandle CreateIndexBuffer(uint32_t size, const void* data) = 0;
 
@@ -27,7 +27,7 @@ namespace ae
 
         // === Shaders ===
         virtual GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
-        virtual void BindIndexBuffer(GPUHandle handle) = 0;
+        virtual void BindShader(GPUHandle handle) = 0;
         virtual void SetUniformInt(GPUHandle handle, const std::string& name, int value) = 0;
         virtual void SetUniformFloat(GPUHandle handle, const std::string& name, float value) = 0;
         virtual void SetUniformVec3(GPUHandle handle, const std::string& name, const float* vec3) = 0;
@@ -44,5 +44,7 @@ namespace ae
         virtual void BindTexture(GPUHandle handle, uint32_t slot = 0) = 0;
 
         virtual void DrawIndexed(uint32_t indexCount) = 0;
+
+        virtual ~RenderAPI() = default;
     };
 } // namespace ae
