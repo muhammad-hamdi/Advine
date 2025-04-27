@@ -2,6 +2,7 @@
 #include "RenderAPI.h"
 
 #include "glad/glad.h"
+#include <unordered_map>
 
 namespace ae
 {
@@ -21,6 +22,9 @@ namespace ae
         void SetUniformFloat(GPUHandle handle, const std::string& name, float value);
         void SetUniformVec3(GPUHandle handle, const std::string& name, const float* vec3);
         void SetUniformMat4(GPUHandle handle, const std::string& name, const float* mat4);
+
+        GPUHandle CreateTexture2D(uint32_t width, uint32_t height, const void* data, int channels = 4);
+        void BindTexture(GPUHandle handle, uint32_t slot = 0);
     private:
         uint32_t BufferType(BufferDataType type) {
             switch (type)
@@ -33,5 +37,11 @@ namespace ae
             // AE_ASSERT(false); TODO: add engine pch with such utils
             return 0;
         }
+
+        void CheckShaderCompilation(GLuint shader, const std::string &shaderType);
+        void CheckProgramLinking(GLuint shaderProgram);
+
+    private:
+        std::unordered_map<std::string, GLint> locations;
     };
 } // namespace ae

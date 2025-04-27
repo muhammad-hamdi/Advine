@@ -1,5 +1,7 @@
 #include "OpenGLRenderAPI.h"
 
+#include <iostream>
+
 namespace ae
 {
     GPUHandle OpenGLRenderAPI::CreateVertexDescription(const BufferLayout& layout)
@@ -19,6 +21,7 @@ namespace ae
         // unbind?
         return handle;
     }
+
     GPUHandle OpenGLRenderAPI::CreateVertexBuffer(uint32_t size, const void *data)
     {
         GPUHandle handle;
@@ -27,6 +30,7 @@ namespace ae
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // hoist STATIC_DRAW to arguments?
         return handle;
     }
+
     GPUHandle OpenGLRenderAPI::CreateIndexBuffer(uint32_t size, const void *data)
     {
         GPUHandle handle;
@@ -35,35 +39,146 @@ namespace ae
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // hoist STATIC_DRAW to arguments?
         return handle;
     }
+
     void OpenGLRenderAPI::BindVertexDescription(GPUHandle handle)
     {
         glBindVertexArray(handle);
     }
+
     void OpenGLRenderAPI::BindVertexBuffer(GPUHandle handle)
     {
         glBindBuffer(GL_ARRAY_BUFFER, handle);
     }
+
     void OpenGLRenderAPI::BindIndexBuffer(GPUHandle handle)
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
     }
+
+    void OpenGLRenderAPI::CheckShaderCompilation(GLuint shader, const std::string& shaderType) {
+        GLint success;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+            std::cerr << shaderType << " shader compilation failed:\n" << infoLog << std::endl;
+        }
+    }
+
+    void OpenGLRenderAPI::CheckProgramLinking(GLuint shaderProgram) {
+        GLint success;
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+            std::cerr << "Program linking failed:\n" << infoLog << std::endl;
+        }
+    }
+
     GPUHandle OpenGLRenderAPI::CreateSahder(const std::string &vertexSrc, const std::string &fragmentSrc)
     {
-        return GPUHandle();
+        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        const char* vertexCStr = vertexSrc.c_str();
+        glShaderSource(vertexShader, 1, &vertexCStr, nullptr);
+        glCompileShader(vertexShader);
+        CheckShaderCompilation(vertexShader, "Vertex");
+
+        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        const char* fragmentCStr = fragmentSrc.c_str();
+        glShaderSource(fragmentShader, 1, &fragmentCStr, nullptr);
+        glCompileShader(fragmentShader);
+        CheckShaderCompilation(fragmentShader, "Fragment");
+
+        GPUHandle shaderProgram = glCreateProgram();
+
+        // Attach shaders
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+
+        // Link program
+        glLinkProgram(shaderProgram);
+        CheckProgramLinking(shaderProgram);
+
+        // Clean up shaders as they're no longer needed after linking
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+        return shaderProgram;
     }
+
     void OpenGLRenderAPI::BindShader(GPUHandle handle)
     {
+        glUseProgram(handle);
     }
+
     void OpenGLRenderAPI::SetUniformInt(GPUHandle handle, const std::string &name, int value)
     {
+        GLint loc;
+        if(locations.find(name) != locations.end()) {
+            loc = locations[name];
+        } else {
+            loc = glGetUniformLocation(handle, name.c_str());
+        }
+        glUniform1i(loc, value);
     }
+
     void OpenGLRenderAPI::SetUniformFloat(GPUHandle handle, const std::string &name, float value)
     {
+        GLint loc;
+        if(locations.find(name) != locations.end()) {
+            loc = locations[name];
+        } else {
+            loc = glGetUniformLocation(handle, name.c_str());
+        }
+        glUniform1f(loc, value);
     }
+
     void OpenGLRenderAPI::SetUniformVec3(GPUHandle handle, const std::string &name, const float *vec3)
     {
+        GLint loc;
+        if(locations.find(name) != locations.end()) {
+            loc = locations[name];
+        } else {
+            loc = glGetUniformLocation(handle, name.c_str());
+        }
+        glUniform3fv(loc, 1, vec3);
     }
+
     void OpenGLRenderAPI::SetUniformMat4(GPUHandle handle, const std::string &name, const float *mat4)
     {
+        GLint loc;
+        if(locations.find(name) != locations.end()) {
+            loc = locations[name];
+        } else {
+            loc = glGetUniformLocation(handle, name.c_str());
+        }
+        glUniformMatrix4fv(loc, 1, GL_FALSE, mat4);
+    }
+
+    GPUHandle OpenGLRenderAPI::CreateTexture2D(uint32_t width, uint32_t height, const void *data, int channels)
+    {
+        GPUHandle textureHandle;
+        glGenTextures(1, &textureHandle);
+        glBindTexture(GL_TEXTURE_2D, textureHandle);
+    
+        // Texture parameters, should be modifiable
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+
+        GLenum format = GL_RGB;
+        if (channels == 1) format = GL_RED;
+        else if (channels == 4) format = GL_RGBA;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        return textureHandle;
+    }
+
+    void OpenGLRenderAPI::BindTexture(GPUHandle handle, uint32_t slot)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, handle);
     }
 } // namespace ae
