@@ -16,7 +16,7 @@ namespace Engine
             const auto& element = elements[i];
             glEnableVertexAttribArray(i);
             glVertexAttribPointer(i, element.count, BufferType(element.type), element.normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (void*)offset);
-            offset += element.count * SizeOfType(element.type);
+            offset += element.count * BufferElementFormat::SizeOfType(element.type);
         }
         // unbind?
         return handle;
@@ -60,6 +60,11 @@ namespace Engine
         GPUHandle fbHandle;
         glGenFramebuffers(1, &fbHandle);
         return fbHandle;
+    }
+
+    void OpenGLRenderAPI::BindFramebuffer(GPUHandle handle)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, handle);
     }
 
     void OpenGLRenderAPI::CheckShaderCompilation(GLuint shader, const std::string& shaderType) {
@@ -161,18 +166,31 @@ namespace Engine
         glUniformMatrix4fv(loc, 1, GL_FALSE, mat4);
     }
 
+    GPUHandle OpenGLRenderAPI::CreateUniformBuffer(uint32_t size)
+    {
+        return GPUHandle();
+    }
+
+    void OpenGLRenderAPI::UpdateBuffer(GPUHandle handle, const void *data, uint32_t size, uint32_t offset)
+    {
+    }
+
+    void OpenGLRenderAPI::BindUniformBufferBlockIndex(GPUHandle shaderHandle, const std::string &name, uint32_t bindingIndex)
+    {
+    }
+
     GPUHandle OpenGLRenderAPI::CreateTexture2D(uint32_t width, uint32_t height, const void *data, int channels)
     {
         GPUHandle textureHandle;
         glGenTextures(1, &textureHandle);
         glBindTexture(GL_TEXTURE_2D, textureHandle);
-    
+
         // Texture parameters, should be modifiable
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
+
 
         GLenum format = GL_RGB;
         if (channels == 1) format = GL_RED;

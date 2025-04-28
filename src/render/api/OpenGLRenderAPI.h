@@ -8,6 +8,9 @@ namespace Engine
 {
     class OpenGLRenderAPI : public RenderAPI
     {
+    public:
+        OpenGLRenderAPI(){}
+        ~OpenGLRenderAPI(){}
         GPUHandle CreateVertexDescription(const BufferLayout& layout);
         GPUHandle CreateVertexBuffer(uint32_t size, const void* data);
         GPUHandle CreateIndexBuffer(uint32_t size, const void* data);
@@ -17,6 +20,7 @@ namespace Engine
         void BindIndexBuffer(GPUHandle handle);
 
         GPUHandle CreateFramebuffer();
+        void BindFramebuffer(GPUHandle handle);
 
         GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc);
         void BindShader(GPUHandle handle);
@@ -24,6 +28,10 @@ namespace Engine
         void SetUniformFloat(GPUHandle handle, const std::string& name, float value);
         void SetUniformVec3(GPUHandle handle, const std::string& name, const float* vec3);
         void SetUniformMat4(GPUHandle handle, const std::string& name, const float* mat4);
+
+        GPUHandle CreateUniformBuffer(uint32_t size);
+        void UpdateBuffer(GPUHandle handle, const void* data, uint32_t size, uint32_t offset = 0);
+        void BindUniformBufferBlockIndex(GPUHandle shaderHandle, const std::string& name, uint32_t bindingIndex);
 
         GPUHandle CreateTexture2D(uint32_t width, uint32_t height, const void* data, int channels = 4);
         GPUHandle CreateTextureRGB(uint32_t width, uint32_t height);

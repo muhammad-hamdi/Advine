@@ -13,23 +13,23 @@ namespace Engine {
         Float16, Float32, Float64
     };
 
-    uint32_t SizeOfType(BufferDataType type) {
-        switch (type)
-            {
-                case BufferDataType::Float32: return 4;
-                case BufferDataType::UInt32:  return 4;
-                case BufferDataType::UInt8:   return 1;
-                // TODO: add rest later
-            }
-            // AE_ASSERT(false); TODO: add engine pch with such utils
-            return 0;
-    }
-
     struct BufferElementFormat
     {
         BufferDataType type;
         uint32_t count;
         bool normalized = false;
+
+        static uint32_t SizeOfType(BufferDataType type) {
+            switch (type)
+                {
+                    case BufferDataType::Float32: return 4;
+                    case BufferDataType::UInt32:  return 4;
+                    case BufferDataType::UInt8:   return 1;
+                    // TODO: add rest later
+                }
+                // AE_ASSERT(false); TODO: add engine pch with such utils
+                return 0;
+        }
     };
 
     class BufferLayout

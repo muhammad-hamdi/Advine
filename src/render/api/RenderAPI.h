@@ -10,6 +10,11 @@ namespace Engine
 {
     using GPUHandle = uint32_t;
 
+    enum class RenderBackend {
+        OpenGL,
+        Vulkan // To Implement Later
+    };
+
     class RenderAPI
     {
     public:
@@ -24,7 +29,7 @@ namespace Engine
 
         // === Framebuffers ===
         virtual GPUHandle CreateFramebuffer() = 0;
-        virtual void BindFramebuffer() = 0;
+        virtual void BindFramebuffer(GPUHandle handle) = 0;
 
         // === Shaders ===
         virtual GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
@@ -49,5 +54,6 @@ namespace Engine
         virtual void DrawIndexed(uint32_t indexCount) = 0;
 
         virtual ~RenderAPI() = default;
+
     };
 } // namespace ae
