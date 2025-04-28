@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include "rendering/Mesh.h"
 #include "core/Entity.h"
@@ -11,23 +10,23 @@
 #include <vector>
 #include <filesystem>
 
-class Model {
-public:
-    void Draw();
+namespace Engine {
+    class Model {
+    public:
+        void Draw();
 
-    std::vector<Mesh> GetMeshes() { return meshes; }
-    void SetMaterial(Material *mat);
+        std::vector<Mesh> GetMeshes() { return meshes; }
+        void SetMaterial(Material* mat);
 
-    Entity *LoadAssimp(const std::string &path);
+        Entity* LoadAssimp(const std::string& path);
 
-    Entity *ProcessNode(aiNode *node, const aiScene *scene, const std::filesystem::path &baseDir);
+        Entity* ProcessNode(aiNode* node, const aiScene* scene, const std::filesystem::path& baseDir);
 
-    Mesh *ProcessMesh(aiMesh *mesh);
+        Mesh* ProcessMesh(aiMesh* mesh);
 
-    Material *LoadMaterial(aiMaterial *aiMat, const std::filesystem::path &baseDir);
+        Material* LoadMaterial(aiMaterial* aiMat, const std::filesystem::path& baseDir);
 
-private:
-    std::vector<Mesh> meshes;
-};
-
-#endif
+    private:
+        std::vector<Mesh> meshes;
+    };
+}

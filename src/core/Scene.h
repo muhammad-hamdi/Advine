@@ -1,5 +1,4 @@
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
 
 #include "core/Camera.h"
 #include "core/GameObject.h"
@@ -12,66 +11,66 @@
 #include <vector>
 #include <memory>
 
-using json = nlohmann::json;
-struct LightData;
+namespace Engine {
+    using json = nlohmann::json;
+    struct LightData;
 
-class Scene {
-public:
-    Scene();
-    Scene(std::string path);
-    ~Scene();
+    class Scene {
+    public:
+        Scene();
+        Scene(std::string path);
+        ~Scene();
 
-    std::vector<Entity *> LoadEntitesFromJson(json jsonEntities, Model &loader, Entity *parent);
+        std::vector<Entity*> LoadEntitesFromJson(json jsonEntities, Model& loader, Entity* parent);
 
-    void LoadFromFile();
+        void LoadFromFile();
 
-    json SerializeEntities(const std::vector<Entity *> &entities);
+        json SerializeEntities(const std::vector<Entity*>& entities);
 
-    void SaveToFile();
+        void SaveToFile();
 
-    void AddGameObject(GameObject* obj);
-    void RemoveGameObject(GameObject* obj);
+        void AddGameObject(GameObject* obj);
+        void RemoveGameObject(GameObject* obj);
 
-    void AddCamera(const std::string& name, Camera* camera);
-    void SetActiveCamera(const std::string& name);
-    void SetActiveCamera(Entity *entity);
-    Camera* GetActiveCamera() const;
-    Entity* GetActiveCameraEntity() const;
-    Entity* CreateEntity(const std::string& name);
-    void AddEntity(Entity* entity);
+        void AddCamera(const std::string& name, Camera* camera);
+        void SetActiveCamera(const std::string& name);
+        void SetActiveCamera(Entity* entity);
+        Camera* GetActiveCamera() const;
+        Entity* GetActiveCameraEntity() const;
+        Entity* CreateEntity(const std::string& name);
+        void AddEntity(Entity* entity);
 
-    void Render(const Camera& camera);
-    void Update(float deltaTime);
+        void Render(const Camera& camera);
+        void Update(float deltaTime);
 
-    template<typename T, typename Predicate>
-    Entity* FindEntityWithComponent(Predicate predicate) {
-        for (Entity* entity : entities) {
-            T* comp = entity->GetComponent<T>();
-            if (comp && predicate(comp)) {
-                return entity;
+        template<typename T, typename Predicate>
+        Entity* FindEntityWithComponent(Predicate predicate) {
+            for (Entity* entity : entities) {
+                T* comp = entity->GetComponent<T>();
+                if (comp && predicate(comp)) {
+                    return entity;
+                }
             }
+            return nullptr;
         }
-        return nullptr;
-    }
 
-    // Optional: A way to get the list of all game objects (if needed for other systems)
-    const std::vector<GameObject*>& GetGameObjects() const;
-    const std::vector<Entity*>& GetEntities() const;
+        // Optional: A way to get the list of all game objects (if needed for other systems)
+        const std::vector<GameObject*>& GetGameObjects() const;
+        const std::vector<Entity*>& GetEntities() const;
 
-    void GatherLights(std::vector<LightData> &lightsOut);
+        void GatherLights(std::vector<LightData>& lightsOut);
 
-    void GetChildLights(std::vector<Entity *> &children, std::vector<LightData> &lightsOut);
+        void GetChildLights(std::vector<Entity*>& children, std::vector<LightData>& lightsOut);
 
-private:
-    std::vector<GameObject*> gameObjects;
-    std::vector<Entity*> entities;
-    Entity* activeCameraEntity = nullptr;
-    LightData mainDirectionalLight;
-    std::map<std::string, Camera*> cameras;  // Store cameras by name
-    Camera* activeCamera = nullptr;          // The active camera
+    private:
+        std::vector<GameObject*> gameObjects;
+        std::vector<Entity*> entities;
+        Entity* activeCameraEntity = nullptr;
+        LightData mainDirectionalLight;
+        std::map<std::string, Camera*> cameras;  // Store cameras by name
+        Camera* activeCamera = nullptr;          // The active camera
 
-    std::string filepath;
-    std::string name;
-};
-
-#endif // SCENE_H
+        std::string filepath;
+        std::string name;
+    };
+}

@@ -3,8 +3,8 @@
 #include <vector>
 #include <memory>
 
-namespace ae
-{
+namespace Engine {
+
     enum class BufferDataType {
         Int8,   UInt8,
         Int16,  UInt16,

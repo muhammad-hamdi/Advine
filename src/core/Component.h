@@ -1,14 +1,16 @@
 #pragma once
 #include "nlohmann/json.hpp"
 
-class Entity;
+namespace Engine {
+    class Entity;
 
-class Component {
-public:
-    virtual ~Component() = default;
-    Entity* owner = nullptr;
+    class Component {
+    public:
+        virtual ~Component() = default;
+        Entity* owner = nullptr;
 
-    virtual void Update(float deltaTime) {};
-    virtual bool IsOverridden() const { return false; }
-    virtual nlohmann::json Serialize() const { return {}; };
-};
+        virtual void Update(float deltaTime) {};
+        virtual bool IsOverridden() const { return false; }
+        virtual nlohmann::json Serialize() const { return {}; };
+    };
+}

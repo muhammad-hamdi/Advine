@@ -3,53 +3,57 @@
 #include "core/Component.h"
 #include "glm/glm.hpp"
 
-enum class LightType {
-    Directional,
-    Point,
-    Spot
-};
+namespace Engine {
 
-struct LightComponent : public Component {
-    LightType type = LightType::Point;
+    enum class LightType {
+        Directional,
+        Point,
+        Spot
+    };
 
-    glm::vec3 color = glm::vec3(1.0f);
-    float intensity = 1.0f;
+    struct LightComponent : public Component {
+        LightType type = LightType::Point;
 
-    float range = 10.0f; // Only used for Point & Spot lights
-    float constant = 1.0f;
-    float linear = 0.09;
-    float quadratic = 0.032;
+        glm::vec3 color = glm::vec3(1.0f);
+        float intensity = 1.0f;
 
-    float spotAngle = glm::radians(30.0f); // Only used for Spot lights
+        float range = 10.0f; // Only used for Point & Spot lights
+        float constant = 1.0f;
+        float linear = 0.09;
+        float quadratic = 0.032;
 
-    bool castShadows = false;
-    bool isMainDirectional = false; // Renderer can pick this as the sun
+        float spotAngle = glm::radians(30.0f); // Only used for Spot lights
 
-    LightComponent(LightType type)
-        : type(type), color(1.0f), intensity(1.0f), range(10.0f), spotAngle(glm::radians(30.0f)) {}
+        bool castShadows = false;
+        bool isMainDirectional = false; // Renderer can pick this as the sun
 
-    bool IsOverridden() const {
-        return true;
-    }
-
-    json Serialize() const {
-        json j;
-        j["name"] = "light";
-        j["type"] = static_cast<int>(type);
-    
-        j["color"] = { color.r, color.g, color.b };
-        j["intensity"] = intensity;
-
-        if(type == LightType::Spot)
-            j["spotAngle"] = spotAngle;
-
-        if (type != LightType::Directional) {
-            j["range"] = range;
-            j["constant"]  = constant;
-            j["linear"]    = linear;
-            j["quadratic"] = quadratic;
+        LightComponent(LightType type)
+            : type(type), color(1.0f), intensity(1.0f), range(10.0f), spotAngle(glm::radians(30.0f)) {
         }
-    
-        return j;
-    }
-};
+
+        bool IsOverridden() const {
+            return true;
+        }
+
+        json Serialize() const {
+            json j;
+            j["name"] = "light";
+            j["type"] = static_cast<int>(type);
+
+            j["color"] = { color.r, color.g, color.b };
+            j["intensity"] = intensity;
+
+            if (type == LightType::Spot)
+                j["spotAngle"] = spotAngle;
+
+            if (type != LightType::Directional) {
+                j["range"] = range;
+                j["constant"] = constant;
+                j["linear"] = linear;
+                j["quadratic"] = quadratic;
+            }
+
+            return j;
+        }
+    };
+}

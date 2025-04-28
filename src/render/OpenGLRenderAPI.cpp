@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace ae
+namespace Engine
 {
     GPUHandle OpenGLRenderAPI::CreateVertexDescription(const BufferLayout& layout)
     {
@@ -53,6 +53,13 @@ namespace ae
     void OpenGLRenderAPI::BindIndexBuffer(GPUHandle handle)
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
+    }
+
+    GPUHandle OpenGLRenderAPI::CreateFramebuffer()
+    {
+        GPUHandle fbHandle;
+        glGenFramebuffers(1, &fbHandle);
+        return fbHandle;
     }
 
     void OpenGLRenderAPI::CheckShaderCompilation(GLuint shader, const std::string& shaderType) {
@@ -176,9 +183,38 @@ namespace ae
         return textureHandle;
     }
 
+    GPUHandle OpenGLRenderAPI::CreateTextureRGB(uint32_t width, uint32_t height)
+    {
+        GPUHandle texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        return texture;
+    }
+
+    GPUHandle OpenGLRenderAPI::CreateTextureDepth(uint32_t width, uint32_t height)
+    {
+        GPUHandle texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        return texture;
+    }
+
     void OpenGLRenderAPI::BindTexture(GPUHandle handle, uint32_t slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, handle);
+    }
+
+    void OpenGLRenderAPI::DrawIndexed(uint32_t indexCount)
+    {
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
 } // namespace ae

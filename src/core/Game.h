@@ -5,39 +5,41 @@
 #include "core/GameObject.h"
 #include <GLFW/glfw3.h>
 
-enum State {
-    Editor,
-    InGame
-};
+namespace Engine {
+    enum State {
+        Editor,
+        InGame
+    };
 
-class Game {
-public:
-    Game(int windowWidth, int windowHeight, const char* windowTitle);
-    ~Game();
+    class Game {
+    public:
+        Game(int windowWidth, int windowHeight, const char* windowTitle);
+        ~Game();
 
-    void Run();
-    void AddObjectToScene(GameObject* object);
-    void SetActiveCamera(const std::string& name);
-    inline static int state = State::Editor;
+        void Run();
+        void AddObjectToScene(GameObject* object);
+        void SetActiveCamera(const std::string& name);
+        inline static int state = State::Editor;
 
-private:
-    void Initialize();
-    void SetupScene();
-    void Update(float deltaTime);
-    void Render();
-    void ProcessInput(float deltaTime);
+    private:
+        void Initialize();
+        void SetupScene();
+        void Update(float deltaTime);
+        void Render();
+        void ProcessInput(float deltaTime);
 
-    GLFWwindow* window;
-    Scene* scene;
-    Camera* editorCamera;
-    UI* uiManager;
+        ::GLFWwindow* window;
+        Scene* scene;
+        Camera* editorCamera;
+        UI* uiManager;
 
-    std::string windowTitle;
+        std::string windowTitle;
 
-    inline static int windowWidth;
-    inline static int windowHeight;
+        inline static int windowWidth;
+        inline static int windowHeight;
 
-    static void ResizeCallback(GLFWwindow* window, int width, int height);
+        static void ResizeCallback(::GLFWwindow* window, int width, int height);
 
-    float fps = 0;
-};
+        float fps = 0;
+    };
+}

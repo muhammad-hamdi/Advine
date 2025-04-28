@@ -3,25 +3,28 @@
 #include "core/Entity.h"
 
 struct GLFWwindow;
-class Game;
 
-class UI {
-public:
-    UI(GLFWwindow* window);
-    ~UI();
+namespace Engine {
+    class Game;
 
-    static const int imguiPanelWidth = 300;
-    GameObject* selectedObject = nullptr;
-    Entity* selectedEntity = nullptr;
+    class UI {
+    public:
+        UI(::GLFWwindow* window);
+        ~UI();
 
-    void ShowFPS(float fps);
-    void StartFrame();
-    void Render();
+        static const int imguiPanelWidth = 300;
+        GameObject* selectedObject = nullptr;
+        Entity* selectedEntity = nullptr;
 
-    void ShowGameObjectEditor(Scene* scene);
-    void DrawObjectTree(GameObject* n, int id);
-    void DrawSceneGraph(Entity* n, int id);
+        void ShowFPS(float fps);
+        void StartFrame();
+        void Render();
 
-private:
-    GLFWwindow* window;
-};
+        void ShowGameObjectEditor(Scene* scene);
+        void DrawObjectTree(GameObject* n, int id);
+        void DrawSceneGraph(Entity* n, int id);
+
+    private:
+        ::GLFWwindow* window;
+    };
+}

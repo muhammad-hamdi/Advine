@@ -1,5 +1,4 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#pragma once
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
@@ -32,28 +31,29 @@ static bool GLLogCall(const char *function, const char *file, int line) {
 }
 
 #include "LightData.h"
-class Mesh;
-class Material;
-class Entity;
-class Scene;
 
-class Renderer {
-public:
-    static void RenderScene(Scene& scene);
-    static void RenderEntity(Entity *entity);
-    static void DrawMesh(Mesh *mesh, Material *material, const glm::mat4 &modelMatrix);
+namespace Engine {
+    class Mesh;
+    class Material;
+    class Entity;
+    class Scene;
 
-    static glm::mat4 GetViewMatrix();
-    static glm::mat4 GetProjectionMatrix();
-    static glm::vec3 GetCameraPosition();
+    class Renderer {
+    public:
+        static void RenderScene(Scene& scene);
+        static void RenderEntity(Entity* entity);
+        static void DrawMesh(Mesh* mesh, Material* material, const glm::mat4& modelMatrix);
 
-    static void SetViewProjection(glm::mat4 view, glm::mat4 projection, glm::vec3 camPosition);
-private:
+        static glm::mat4 GetViewMatrix();
+        static glm::mat4 GetProjectionMatrix();
+        static glm::vec3 GetCameraPosition();
 
-    inline static glm::mat4 viewMatrix;
-    inline static glm::mat4 projectionMatrix;
-    inline static glm::vec3 cameraPosition;
-    inline static std::vector<LightData> lightsToRender;
-};
+        static void SetViewProjection(glm::mat4 view, glm::mat4 projection, glm::vec3 camPosition);
+    private:
 
-#endif
+        inline static glm::mat4 viewMatrix;
+        inline static glm::mat4 projectionMatrix;
+        inline static glm::vec3 cameraPosition;
+        inline static std::vector<LightData> lightsToRender;
+    };
+}

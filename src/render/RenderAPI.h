@@ -6,7 +6,7 @@
 
 #include "BufferLayout.h"
 
-namespace ae
+namespace Engine
 {
     using GPUHandle = uint32_t;
 
@@ -24,6 +24,7 @@ namespace ae
 
         // === Framebuffers ===
         virtual GPUHandle CreateFramebuffer() = 0;
+        virtual void BindFramebuffer() = 0;
 
         // === Shaders ===
         virtual GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
@@ -41,6 +42,8 @@ namespace ae
 
         // === Textures ===
         virtual GPUHandle CreateTexture2D(uint32_t width, uint32_t height, const void* data, int channels = 4) = 0;
+        virtual GPUHandle CreateTextureRGB(uint32_t width, uint32_t height) = 0;
+        virtual GPUHandle CreateTextureDepth(uint32_t width, uint32_t height) = 0;
         virtual void BindTexture(GPUHandle handle, uint32_t slot = 0) = 0;
 
         virtual void DrawIndexed(uint32_t indexCount) = 0;

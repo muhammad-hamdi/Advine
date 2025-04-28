@@ -4,7 +4,7 @@
 #include "glad/glad.h"
 #include <unordered_map>
 
-namespace ae
+namespace Engine
 {
     class OpenGLRenderAPI : public RenderAPI
     {
@@ -16,6 +16,8 @@ namespace ae
         void BindVertexBuffer(GPUHandle handle);
         void BindIndexBuffer(GPUHandle handle);
 
+        GPUHandle CreateFramebuffer();
+
         GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc);
         void BindShader(GPUHandle handle);
         void SetUniformInt(GPUHandle handle, const std::string& name, int value);
@@ -24,7 +26,11 @@ namespace ae
         void SetUniformMat4(GPUHandle handle, const std::string& name, const float* mat4);
 
         GPUHandle CreateTexture2D(uint32_t width, uint32_t height, const void* data, int channels = 4);
+        GPUHandle CreateTextureRGB(uint32_t width, uint32_t height);
+        GPUHandle CreateTextureDepth(uint32_t width, uint32_t height);
         void BindTexture(GPUHandle handle, uint32_t slot = 0);
+
+        void DrawIndexed(uint32_t indexCount);
     private:
         uint32_t BufferType(BufferDataType type) {
             switch (type)

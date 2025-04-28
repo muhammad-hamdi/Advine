@@ -1,24 +1,25 @@
 #include "Material.h"
 
-void Material::Bind()
-{
-    if (!shader) return;
-    shader->Use();
+namespace Engine {
+    void Material::Bind()
+    {
+        if (!shader) return;
+        shader->Use();
 
-    int unit = 0;
-    for(int i = 0; i < diffuseTextures.size(); i++, unit++) {
-        diffuseTextures[i]->Bind(unit);
-        // name in shader u_DiffuseTextureN
-        shader->SetInt("u_DiffuseTexture" + std::to_string(i+1), unit);
-    }
+        int unit = 0;
+        for (int i = 0; i < diffuseTextures.size(); i++, unit++) {
+            diffuseTextures[i]->Bind(unit);
+            // name in shader u_DiffuseTextureN
+            shader->SetInt("u_DiffuseTexture" + std::to_string(i + 1), unit);
+        }
 
-    for(int i = 0; i < specularTextures.size(); i++, unit++) {
-        specularTextures[i]->Bind(unit);
-        shader->SetInt("u_SpecularTexture" + std::to_string(i+1), unit);
-    }
+        for (int i = 0; i < specularTextures.size(); i++, unit++) {
+            specularTextures[i]->Bind(unit);
+            shader->SetInt("u_SpecularTexture" + std::to_string(i + 1), unit);
+        }
 
-    for (const auto& [name, value] : customUniforms) {
-        switch (value.second) {
+        for (const auto& [name, value] : customUniforms) {
+            switch (value.second) {
             case GL_FLOAT:
                 shader->SetFloat(name, value.first.f);
                 break;
@@ -31,30 +32,31 @@ void Material::Bind()
             case GL_FLOAT_MAT4:
                 shader->SetMat4(name, value.first.m4);
                 break;
-            // add more types
+                // add more types
+            }
+        }
+
+        shader->ApplyGlobalUniforms();
+    }
+
+    void Material::UnBind() {
+        if (!shader) return;
+        shader->Use();
+
+        int unit = 0;
+        for (int i = 0; i < diffuseTextures.size(); i++, unit++) {
+            diffuseTextures[i]->UnBind(unit);
+            shader->SetInt("u_DiffuseTexture" + std::to_string(i + 1), -1);
+        }
+
+        for (int i = 0; i < specularTextures.size(); i++, unit++) {
+            specularTextures[i]->UnBind(unit);
+            shader->SetInt("u_SpecularTexture" + std::to_string(i + 1), -1);
         }
     }
 
-    shader->ApplyGlobalUniforms();
-}
-
-void Material::UnBind() {
-    if (!shader) return;
-    shader->Use();
-
-    int unit = 0;
-    for(int i = 0; i < diffuseTextures.size(); i++, unit++) {
-        diffuseTextures[i]->UnBind(unit);
-        shader->SetInt("u_DiffuseTexture" + std::to_string(i+1), -1);
+    const std::vector<UniformInfo>& Material::GetUniformMetadata() const
+    {
+        return uniformMetadata;
     }
-
-    for(int i = 0; i < specularTextures.size(); i++, unit++) {
-        specularTextures[i]->UnBind(unit);
-        shader->SetInt("u_SpecularTexture" + std::to_string(i+1), -1);
-    }
-}
-
-const std::vector<UniformInfo> &Material::GetUniformMetadata() const
-{
-    return uniformMetadata;
 }
