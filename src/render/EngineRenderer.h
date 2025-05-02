@@ -8,7 +8,7 @@ class Material;
 
 namespace Engine
 {
-    class NRRenderer
+    class NRenderer
     {
     private:
         static std::shared_ptr<RenderAPI> sAPI;

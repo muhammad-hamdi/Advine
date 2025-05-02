@@ -7,10 +7,12 @@ namespace Engine {
             case RenderBackend::OpenGL: return std::make_shared<OpenGLRenderAPI>();
             // case RenderBackend::Vulkan: return std::make_shared<VulkanRenderAPI>();
         }
+        assert(false, "failed to create render api");
+        return nullptr;
     }
 
-    std::shared_ptr<RenderAPI> NRRenderer::sAPI;
-    void NRRenderer::Init(RenderBackend backend)
+    std::shared_ptr<RenderAPI> NRenderer::sAPI;
+    void NRenderer::Init(RenderBackend backend)
     {
         switch (backend)
         {
@@ -21,22 +23,22 @@ namespace Engine {
         // sAPI->Init(); // Let API initialize itself (e.g., load GL extensions)
     }
 
-    void NRRenderer::BeginFrame()
+    void NRenderer::BeginFrame()
     {
         assert(false, "not implemented");
     }
 
-    void NRRenderer::EndFrame()
+    void NRenderer::EndFrame()
     {
         assert(false, "not implemented");
     }
 
-    std::shared_ptr<RenderAPI> NRRenderer::GetAPI()
+    std::shared_ptr<RenderAPI> NRenderer::GetAPI()
     {
         return sAPI;
     }
 
-    void NRRenderer::SubmitMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform)
+    void NRenderer::SubmitMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform)
     {
         // Later: Queue draw calls, sort them, etc.
         // For now: Simple immediate mode submission
