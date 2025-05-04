@@ -1,8 +1,11 @@
 #pragma once
-#include "Scene.h"
-#include "Camera.h"
-#include "UI.h"
+#include "core/Scene.h"
+#include "core/Camera.h"
+#include "core/UI.h"
 #include "core/GameObject.h"
+
+#include "render/NRenderer.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Engine {
@@ -12,6 +15,15 @@ namespace Engine {
     };
 
     class Game {
+    private:
+        float fps = 0;
+        std::string windowTitle;
+        NRenderer mRenderer;
+
+        ::GLFWwindow* window;
+        Scene* scene;
+        Camera* editorCamera;
+        UI* uiManager;
     public:
         Game(int windowWidth, int windowHeight, const char* windowTitle);
         ~Game();
@@ -28,18 +40,9 @@ namespace Engine {
         void Render();
         void ProcessInput(float deltaTime);
 
-        ::GLFWwindow* window;
-        Scene* scene;
-        Camera* editorCamera;
-        UI* uiManager;
-
-        std::string windowTitle;
-
         inline static int windowWidth;
         inline static int windowHeight;
 
         static void ResizeCallback(::GLFWwindow* window, int width, int height);
-
-        float fps = 0;
     };
 }

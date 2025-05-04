@@ -19,8 +19,20 @@ namespace Engine
     {
     public:
         // === Buffers ===
+
+        /// @brief specify the layout of vertex data (e.g. VertexArrayObject in OpenGL)
+        /// @param layout 
+        /// @return GPUHandle
         virtual GPUHandle CreateVertexDescription(const BufferLayout& layout) = 0;
+        /// @brief Upload vertex data to GPU and get a handle to it
+        /// @param size 
+        /// @param data 
+        /// @return GPUHandle
         virtual GPUHandle CreateVertexBuffer(uint32_t size, const void* data) = 0;
+        /// @brief Upload index array data to GPU and get a handle to it
+        /// @param size 
+        /// @param data 
+        /// @return GPUHandle
         virtual GPUHandle CreateIndexBuffer(uint32_t size, const void* data) = 0;
 
         virtual void BindVertexDescription(GPUHandle handle) = 0;
@@ -32,7 +44,7 @@ namespace Engine
         virtual void BindFramebuffer(GPUHandle handle) = 0;
 
         // === Shaders ===
-        virtual GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
+        virtual GPUHandle CreateShader(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
         virtual void BindShader(GPUHandle handle) = 0;
         virtual void SetUniformInt(GPUHandle handle, const std::string& name, int value) = 0;
         virtual void SetUniformFloat(GPUHandle handle, const std::string& name, float value) = 0;

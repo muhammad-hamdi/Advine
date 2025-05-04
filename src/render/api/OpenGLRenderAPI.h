@@ -22,7 +22,7 @@ namespace Engine
         GPUHandle CreateFramebuffer();
         void BindFramebuffer(GPUHandle handle);
 
-        GPUHandle CreateSahder(const std::string& vertexSrc, const std::string& fragmentSrc);
+        GPUHandle CreateShader(const std::string& vertexSrc, const std::string& fragmentSrc);
         void BindShader(GPUHandle handle);
         void SetUniformInt(GPUHandle handle, const std::string& name, int value);
         void SetUniformFloat(GPUHandle handle, const std::string& name, float value);

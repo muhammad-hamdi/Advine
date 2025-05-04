@@ -2,12 +2,12 @@
 
 namespace Engine
 {
-    struct Context {
+    // struct Context {
         // AssetManager* assetManager;
         // NRenderer* renderer;
         // ::GLFWWindow* window;
         // Scene* scene;
-    };
+    // };
 
     class Application
     {
@@ -16,7 +16,7 @@ namespace Engine
         // NRenderer mRenderer;
         // ::GLFWWindow mWindow;
         // Scene mScene;
-        Context mContext;
+        // Context mContext;
     public:
         Application(/* args */);
         ~Application();

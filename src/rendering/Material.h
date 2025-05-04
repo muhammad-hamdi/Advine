@@ -3,6 +3,9 @@
 #include "assets/Shader.h"
 #include "assets/Texture.h"
 
+#include "render/NShader.h"
+#include "render/NTexture.h"
+
 #include <vector>
 #include <unordered_map>
 
@@ -35,6 +38,9 @@ namespace Engine {
     */
 
     class Material {
+    private:
+        NShader* nShader;
+        std::unordered_map<std::string, NTexture*> nTextures;
     public:
         std::string name;
         Shader* shader;
@@ -49,12 +55,28 @@ namespace Engine {
 
         bool isLit = true;
 
+        Material(const std::string& name, NShader* shader) : name(name), nShader(shader) {}
+
         Material(const std::string& name, Shader* shader, Texture* diffuseTexture = nullptr, Texture* specularTexture = nullptr)
             : name(name), shader(shader) {
             if (shader) {
                 uniformMetadata = shader->GetCustomUniforms();
                 GetUniformValues();
             }
+        }
+
+        GPUHandle GetShaderHandle() const { return nShader->handle; }
+        void SetShader(NShader* newShader) {
+            nShader = newShader;
+            // if (shader) {
+            //     uniformMetadata = shader->GetCustomUniforms();  // <- store info
+            //     GetUniformValues();
+            // }
+        }
+
+        std::unordered_map<std::string, NTexture*> GetTextures() const { return nTextures; }
+        void AddTexture(const std::string& name, NTexture* tex) {
+            nTextures[name] = tex;
         }
 
         Shader* GetShader() const { return shader; }

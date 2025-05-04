@@ -8,6 +8,9 @@
 #include "assets/Texture.h"
 #include "rendering/Material.h"
 
+#include "render/NShader.h"
+#include "render/NTexture.h"
+
 namespace Engine {
     class AssetManager {
     public:
@@ -30,11 +33,20 @@ namespace Engine {
 
         static void Clear();
 
+        // new loaders
+
+        static std::string ExtractPathFromInclude(const std::string& include);
+        static std::string LoadShaderSource(const std::string& path, std::unordered_set<std::string>& included);
+        static NShader* LoadNShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
+        static NTexture* LoadNTexture(const std::string& name, const std::string& path);
     private:
         static std::unordered_map<std::string, std::unique_ptr<Model>> models;
         static std::unordered_map<std::string, std::unique_ptr<Shader>> shaders;
         static std::unordered_map<std::string, std::unique_ptr<Texture>> textures;
         static std::unordered_map<std::string, std::unique_ptr<Material>> materials;
         static inline Material* defaultMaterial = nullptr;
+
+        static std::unordered_map<std::string, std::unique_ptr<NShader>> nShaders;
+        static std::unordered_map<std::string, std::unique_ptr<NTexture>> nTextures;
     };
 }

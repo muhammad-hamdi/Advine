@@ -1,5 +1,7 @@
 #include "Mesh.h"
 
+#include "core/Context.h"
+
 namespace Engine {
     Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned int> inds)
         : vertices(verts), indices(inds), vb(verts.data(), verts.size() * sizeof(Vertex)), ib(inds.data(), inds.size())
@@ -9,6 +11,7 @@ namespace Engine {
         layout.Push<float>(3);
         layout.Push<float>(2);
         va.AddBuffer(vb, layout);
+        Upload();
         // SetupMesh();
     }
 
@@ -18,6 +21,14 @@ namespace Engine {
         // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         // va.Unbind();
         // glBindVertexArray(0);
+    }
+
+    void Mesh::Upload()
+    {
+        auto api = Context::Get().GetRenderer()->GetAPI();
+        vertexDescription = api->CreateVertexDescription(Vertex::GetLayout());
+        vertexBuffer = api->CreateVertexBuffer(vertices.size() * sizeof(Vertex), vertices.data());
+        indexBuffer = api->CreateIndexBuffer(indices.size() * sizeof(unsigned int), indices.data());
     }
 
     void Mesh::SetMaterial(Material* mat)

@@ -87,7 +87,7 @@ namespace Engine
         }
     }
 
-    GPUHandle OpenGLRenderAPI::CreateSahder(const std::string &vertexSrc, const std::string &fragmentSrc)
+    GPUHandle OpenGLRenderAPI::CreateShader(const std::string &vertexSrc, const std::string &fragmentSrc)
     {
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         const char* vertexCStr = vertexSrc.c_str();

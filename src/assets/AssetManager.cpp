@@ -1,5 +1,15 @@
 #include "AssetManager.h"
 
+#include "core/Context.h"
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <unordered_set>
+#include <filesystem>
+#include <stb_image.h>
+
 namespace Engine {
 
     std::unordered_map<std::string, std::unique_ptr<Model>> AssetManager::models;
@@ -96,4 +106,95 @@ namespace Engine {
         textures.clear();
     }
 
+    std::string AssetManager::ExtractPathFromInclude(const std::string& include)
+    {
+        int s = 0, e = 0;
+        for (int i = 0; i < include.size(); i++) {
+            if (s == 0) {
+                if (include[i] == '"' || include[i] == '<') {
+                    s = i + 1;
+                }
+            }
+            else {
+                if (include[i] == '"' || include[i] == '>') {
+                    e = i;
+                }
+            }
+        }
+        std::string path = include.substr(s, e - s);
+        return path;
+    }
+
+    std::string AssetManager::LoadShaderSource(const std::string &path, std::unordered_set<std::string> &included)
+    {
+        std::ifstream file(path);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open shader file: " << path << std::endl;
+            return 0;
+        }
+
+        std::stringstream output;
+        std::string line;
+        std::string dir = std::filesystem::path(path).parent_path().string();
+
+        while (std::getline(file, line)) {
+            if (line.rfind("#include", 0) == 0) {
+                std::string includePath = ExtractPathFromInclude(line); // e.g. from #include "common.glsl"
+                std::string fullPath = dir + "/" + includePath;
+
+                // Avoid recursive includes
+                if (included.count(fullPath)) continue;
+                included.insert(fullPath);
+
+                output << LoadShaderSource(fullPath, included) << "\n";
+            }
+            else {
+                output << line << "\n";
+            }
+        }
+
+        return output.str();
+    }
+    NShader *AssetManager::LoadNShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath)
+    {
+        auto it = nShaders.find(name);
+        if (it != nShaders.end()) {
+            // printf("INFO: Loaded Default Shader");
+            return it->second.get();
+        }
+        auto api = Context::Get().GetRenderer()->GetAPI();
+        auto shader = std::make_unique<NShader>();
+        std::unordered_set<std::string> included;
+        std::string vertexSrc = LoadShaderSource(vertexPath, included);
+        included.clear();
+        std::string fragmentSrc = LoadShaderSource(fragmentPath, included);
+        shader->handle = api->CreateShader(vertexSrc, fragmentSrc);
+        shader->vertexPath = vertexPath;
+        shader->fragmentPath = fragmentPath;
+        nShaders[name] = std::move(shader);
+        return nShaders[name].get();
+    }
+
+    NTexture *AssetManager::LoadNTexture(const std::string &name, const std::string &path)
+    {
+        auto it = nTextures.find(name);
+        if (it != nTextures.end()) return it->second.get();
+
+        auto api = Context::Get().GetRenderer()->GetAPI();
+        auto texture = std::make_unique<NTexture>();
+
+        stbi_set_flip_vertically_on_load(true); // Flip to match OpenGL convention
+        unsigned char* data = stbi_load(path.c_str(), &texture->width, &texture->height, &texture->channels, 0);
+        if (data) {
+            texture->handle = api->CreateTexture2D(texture->width, texture->height, data, texture->channels);
+            texture->filepath = path;
+        }
+        else {
+            std::cerr << "Failed to load texture: " << path << std::endl;
+        }
+        stbi_image_free(data);
+
+        nTextures[name] = std::move(texture);
+        return nTextures[name].get();
+    }
 }
