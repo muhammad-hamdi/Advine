@@ -1,8 +1,5 @@
 #include "NRenderer.h"
 
-#include "rendering/Material.h"
-#include "rendering/Mesh.h"
-
 #include <assert.h>
 
 namespace Engine {
@@ -62,21 +59,22 @@ namespace Engine {
 
     void NRenderer::BeginFrame()
     {
-        assert(false, "not implemented");
+        api->Clear();
     }
 
     void NRenderer::EndFrame()
     {
-        assert(false, "not implemented");
+        // execute commands, swap buffers
+        // reserved for when adding APIs other than OpenGL
     }
 
-    void NRenderer::SubmitMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform)
+    void NRenderer::SubmitMesh(const Mesh &mesh, const Material &material, const glm::mat4 &transform)
     {
         GPUHandle shader = material.GetShaderHandle();
-        //  // 1. Bind the shader
+        // Bind the shader
         api->BindShader(shader);
 
-        // // 2. Bind the textures
+        // Bind the textures
         int slot = 0;
         for (auto& [name, texture] : material.GetTextures()) {
             api->BindTexture(texture->handle, slot);
@@ -84,20 +82,27 @@ namespace Engine {
         }
 
         // TODO: move transformation matrices to UBO
+        // api->UpdateUniformBuffer(material.GetTransformUBO(), &transform, sizeof(glm::mat4));
+        // Upload transforms or material data
+        api->SetUniformInt(shader, "u_IsLit", material.isLit);
         api->SetUniformMat4(shader, "u_Model", glm::value_ptr(transform));
         api->SetUniformMat4(shader, "u_View", glm::value_ptr(mCurrentCamera.view));
         api->SetUniformMat4(shader, "u_Projection", glm::value_ptr(mCurrentCamera.projection));
         api->SetUniformMat4(shader, "u_CameraPos", glm::value_ptr(mCurrentCamera.cameraPosition));
 
-        // // 3. Upload transforms or material data
-        // api->UpdateUniformBuffer(material.GetTransformUBO(), &transform, sizeof(glm::mat4));
-
-        // // 4. Bind vertex/index buffers
+        // Bind vertex/index buffers
+        api->BindVertexDescription(mesh.GetVertexDescriptionHandle());
         api->BindVertexBuffer(mesh.GetVertexBufferHandle());
         api->BindIndexBuffer(mesh.GetIndexBufferHandle());
-        api->BindVertexDescription(mesh.GetVertexDescriptionHandle());
 
-        // // 5. Submit draw call
+        // Submit draw call
         api->DrawIndexed(mesh.GetIndexCount());
+
+        // Cleanup
+        slot = 0;
+        for (auto& [name, texture] : material.GetTextures()) {
+            api->BindTexture(0, slot++);
+            api->SetUniformInt(shader, name, -1);
+        }
     }
 }

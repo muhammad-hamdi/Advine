@@ -186,17 +186,6 @@ namespace Engine {
         out << sceneJson.dump(4);
     }
 
-    void Scene::AddGameObject(GameObject* obj) {
-        gameObjects.push_back(obj);
-    }
-
-    void Scene::RemoveGameObject(GameObject* obj) {
-        auto it = std::remove(gameObjects.begin(), gameObjects.end(), obj);
-        if (it != gameObjects.end()) {
-            gameObjects.erase(it);
-        }
-    }
-
     void Scene::AddCamera(const std::string& name, Camera* camera) {
         cameras[name] = camera;
     }
@@ -241,10 +230,6 @@ namespace Engine {
         for (const auto& entity : entities) {
             entity->Update(deltaTime);
         }
-    }
-
-    const std::vector<GameObject*>& Scene::GetGameObjects() const {
-        return gameObjects;
     }
 
     const std::vector<Entity*>& Scene::GetEntities() const

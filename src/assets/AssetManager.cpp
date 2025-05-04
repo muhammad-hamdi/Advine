@@ -16,6 +16,8 @@ namespace Engine {
     std::unordered_map<std::string, std::unique_ptr<Shader>> AssetManager::shaders;
     std::unordered_map<std::string, std::unique_ptr<Texture>> AssetManager::textures;
     std::unordered_map<std::string, std::unique_ptr<Material>> AssetManager::materials;
+    std::unordered_map<std::string, std::unique_ptr<NShader>> AssetManager::nShaders;
+    std::unordered_map<std::string, std::unique_ptr<NTexture>> AssetManager::nTextures;
 
     void AssetManager::Init() {
         Shader* defaultShader = LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
@@ -83,6 +85,12 @@ namespace Engine {
         printf("INFO: Loading Shader {%s}\n", name.c_str());
         auto it = shaders.find(name);
         return (it != shaders.end()) ? it->second.get() : nullptr;
+    }
+
+    NShader* AssetManager::GetNShader(const std::string& name) {
+        printf("INFO: Loading Shader {%s}\n", name.c_str());
+        auto it = nShaders.find(name);
+        return (it != nShaders.end()) ? it->second.get() : nullptr;
     }
 
     Texture* AssetManager::GetTexture(const std::string& name) {

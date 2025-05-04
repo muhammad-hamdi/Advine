@@ -30,21 +30,21 @@ namespace Engine {
 
     void Renderer::DrawMesh(Mesh* mesh, Material* material, const glm::mat4& modelMatrix)
     {
-        material->Bind();
-        Shader* shader = material->GetShader();
-        shader->SetMat4("u_Model", modelMatrix);
-        if (material->isLit) {
-            shader->ApplyLightUniforms(lightsToRender);
-        }
-        else {
-            shader->SetInt("u_IsLit", false);
-        }
+        // material->Bind();
+        // Shader* shader = material->GetShader();
+        // shader->SetMat4("u_Model", modelMatrix);
+        // if (material->isLit) {
+        //     shader->ApplyLightUniforms(lightsToRender);
+        // }
+        // else {
+        //     shader->SetInt("u_IsLit", false);
+        // }
 
-        mesh->GetVA().Bind();
-        GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIB().GetCount(), GL_UNSIGNED_INT, 0));
-        mesh->GetVA().Unbind();
-        // mesh->Draw();
-        material->UnBind();
+        // mesh->GetVA().Bind();
+        // GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIB().GetCount(), GL_UNSIGNED_INT, 0));
+        // mesh->GetVA().Unbind();
+        // // mesh->Draw();
+        // material->UnBind();
     }
 
     glm::mat4 Renderer::GetViewMatrix()

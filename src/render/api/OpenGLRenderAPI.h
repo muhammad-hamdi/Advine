@@ -3,14 +3,48 @@
 
 #include "glad/glad.h"
 #include <unordered_map>
+#include <iostream>
 
 namespace Engine
 {
+#ifdef _WIN32
+#define DEBUG __debugbreak
+#else
+#include <signal.h>
+#define DEBUG raise(SIGTRAP)
+#endif
+
+#define ASSERT(x) if(!(x)) DEBUG();
+
+#define GLCall(x)   GLClearError(); \
+                    x; \
+                    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+
+    static void GLClearError() {
+        while(glGetError() != GL_NO_ERROR);
+    }
+
+    static bool GLLogCall(const char *function, const char *file, int line) {
+        while(GLenum error = glGetError()) {
+            std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
+            return false;
+        }
+        return true;
+    }
+
     class OpenGLRenderAPI : public RenderAPI
     {
     public:
-        OpenGLRenderAPI(){}
+        OpenGLRenderAPI(){
+            // viewport setting
+            // depth enable
+        }
         ~OpenGLRenderAPI(){}
+
+        void Clear();
+        void SetViewport(int x, int y, int width, int height);
+        void SetDepth(bool enable);
+
         GPUHandle CreateVertexDescription(const BufferLayout& layout);
         GPUHandle CreateVertexBuffer(uint32_t size, const void* data);
         GPUHandle CreateIndexBuffer(uint32_t size, const void* data);

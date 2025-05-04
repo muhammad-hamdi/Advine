@@ -1,7 +1,8 @@
 #pragma once
 
+#include "assets/Model.h"
+
 #include "core/Camera.h"
-#include "core/GameObject.h"
 #include "core/Entity.h"
 #include "rendering/LightData.h"
 
@@ -29,9 +30,6 @@ namespace Engine {
 
         void SaveToFile();
 
-        void AddGameObject(GameObject* obj);
-        void RemoveGameObject(GameObject* obj);
-
         void AddCamera(const std::string& name, Camera* camera);
         void SetActiveCamera(const std::string& name);
         void SetActiveCamera(Entity* entity);
@@ -55,7 +53,6 @@ namespace Engine {
         }
 
         // Optional: A way to get the list of all game objects (if needed for other systems)
-        const std::vector<GameObject*>& GetGameObjects() const;
         const std::vector<Entity*>& GetEntities() const;
 
         void GatherLights(std::vector<LightData>& lightsOut);
@@ -63,7 +60,6 @@ namespace Engine {
         void GetChildLights(std::vector<Entity*>& children, std::vector<LightData>& lightsOut);
 
     private:
-        std::vector<GameObject*> gameObjects;
         std::vector<Entity*> entities;
         Entity* activeCameraEntity = nullptr;
         LightData mainDirectionalLight;

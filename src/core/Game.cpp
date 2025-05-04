@@ -18,7 +18,7 @@
 
 namespace Engine {
     Game::Game(int winWidth, int winHeight, const char* windowTitle)
-        : windowTitle(windowTitle), window(nullptr), scene(nullptr), editorCamera(nullptr), uiManager(nullptr) {
+        : windowTitle(windowTitle), mSceneRenderer(&mRenderer) {
         windowWidth = winWidth;
         windowHeight = winHeight;
         Initialize();
@@ -57,8 +57,8 @@ namespace Engine {
         glfwSetFramebufferSizeCallback(window, ResizeCallback);
 
         glfwGetWindowSize(window, &windowWidth, &windowHeight);
-        glViewport(0, 0, windowWidth, windowHeight);
-        glEnable(GL_DEPTH_TEST);
+        mRenderer.GetAPI()->SetViewport(0, 0, windowWidth, windowHeight);
+        mRenderer.GetAPI()->SetDepth(true);
 
         AssetManager::Init();
         Input::Init(window);
@@ -72,10 +72,6 @@ namespace Engine {
 
     void Game::SetupScene() {
         scene = new Scene("assets/scenes/Testing_Scene.json");
-    }
-
-    void Game::AddObjectToScene(GameObject* object) {
-        scene->AddGameObject(object);
     }
 
     void Game::SetActiveCamera(const std::string& name) {
@@ -112,7 +108,7 @@ namespace Engine {
     {
         windowWidth = width;
         windowHeight = height;
-        glViewport(0, 0, width, height);
+        Context::Get().GetRenderer()->GetAPI()->SetViewport(0, 0, windowWidth, windowHeight);
     }
 
     void Game::Update(float deltaTime) {
@@ -121,7 +117,7 @@ namespace Engine {
             editorCamera->Update(deltaTime);
             if (windowHeight > 0) {
                 editorCamera->SetProjectionMatrix(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
-                Renderer::SetViewProjection(editorCamera->GetViewMatrix(), editorCamera->GetProjectionMatrix(), editorCamera->GetPosition());
+                mRenderer.SetCamera(editorCamera->GetViewMatrix(), editorCamera->GetProjectionMatrix(), editorCamera->GetPosition());
             }
         }
         else if (state == State::InGame) {
@@ -130,21 +126,19 @@ namespace Engine {
             Entity* activeCameraEntity = scene->GetActiveCameraEntity();
             if (activeCameraEntity) {
                 auto* cam = activeCameraEntity->GetComponent<CameraComponent>();
-                glm::mat4 view = cam->GetViewMatrix(
-                    activeCameraEntity->GetWorldPosition(),
-                    activeCameraEntity->transform.GetForwardDirection(),
-                    glm::vec3(0.0f, 1.0f, 0.0f)
-                );
+                glm::mat4 view = cam->GetViewMatrix();
                 if (windowHeight > 0) {
                     glm::mat4 projection = cam->GetProjectionMatrix((float)windowWidth / (float)windowHeight);
-                    Renderer::SetViewProjection(view, projection, activeCameraEntity->GetWorldPosition());
+                    mRenderer.SetCamera(view, projection, activeCameraEntity->GetWorldPosition());
                 }
             }
         }
     }
 
     void Game::Render() {
-        Renderer::RenderScene(*scene);
+        mRenderer.BeginFrame();
+        mSceneRenderer.Render(scene);
+        mRenderer.EndFrame();
 
         uiManager->StartFrame();
         uiManager->ShowGameObjectEditor(scene);

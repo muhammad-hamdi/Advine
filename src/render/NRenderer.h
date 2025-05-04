@@ -2,12 +2,13 @@
 #include "render/api/OpenGLRenderAPI.h"
 
 #include "rendering/LightData.h"
+#include "rendering/Material.h"
+#include "rendering/Mesh.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
-#include <glm/glm.hpp>
-
-class Mesh;
-class Material;
 
 namespace Engine
 {

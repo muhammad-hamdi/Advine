@@ -65,6 +65,10 @@ namespace Engine
 
         virtual void DrawIndexed(uint32_t indexCount) = 0;
 
+        virtual void Clear() = 0;
+        virtual void SetViewport(int x, int y, int width, int height) = 0;
+        virtual void SetDepth(bool enable) = 0;
+
         virtual ~RenderAPI() = default;
 
     };

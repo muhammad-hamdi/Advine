@@ -86,7 +86,6 @@ namespace Engine {
     void UI::ShowGameObjectEditor(Scene* scene)
     {
         // List all game objects in the scene
-        std::vector<GameObject*> gameObjects = scene->GetGameObjects();
 
         int windowWidth, windowHeight;
         glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -100,7 +99,6 @@ namespace Engine {
         ImGui::RadioButton("Game", &Game::state, 1);
 
         if (ImGui::Button("Deselect")) {
-            selectedObject = nullptr;
             selectedEntity = nullptr;
         }
         ImGui::SameLine();
@@ -121,9 +119,6 @@ namespace Engine {
             scene->SaveToFile();
         }
         int id = 0;
-        for (auto& obj : gameObjects) {
-            DrawObjectTree(obj, id++);
-        }
 
         for (auto& entity : scene->GetEntities()) {
             DrawSceneGraph(entity, id++);
@@ -131,47 +126,6 @@ namespace Engine {
         ImGui::End();
 
         ImGui::Begin("Entity Inspector", NULL, windowFlags);
-        if (selectedObject != nullptr) {
-            ImGui::Text("Name");
-            ImGui::SameLine();
-            ImGui::InputText("##NameInput", &selectedObject->name);
-            ImGui::Checkbox("World Transofrm", &selectedObject->isWorldSpace);
-            if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-                // Show the properties of the selected game selectedObjectect
-                // Display the position
-                glm::vec3 position = selectedObject->GetPosition();
-                if (ImGui::DragFloat3("Position", &position[0])) {
-                    selectedObject->SetPosition(position);
-                }
-
-                // Display the rotation
-                glm::vec3 rotation = selectedObject->GetRotation();  // Convert quat to Euler angles
-                if (ImGui::DragFloat3("Rotation", &rotation[0])) {
-                    selectedObject->SetRotation(rotation);
-                }
-
-                // Display the scale
-                glm::vec3 scale = selectedObject->GetScale();
-                if (ImGui::DragFloat3("Scale", &scale[0])) {
-                    selectedObject->SetScale(scale);
-                }
-
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
-                if (selectedObject->model) {
-                    for (auto mesh : selectedObject->model->GetMeshes()) {
-                        auto mat = selectedObject->GetMaterialForMesh(&mesh);
-                        ImGui::Text("Name:");
-                        ImGui::SameLine();
-                        ImGui::Text(mat->name.c_str());
-                        DrawMaterialEditor(mat);
-                    }
-                }
-                ImGui::TreePop();
-            }
-        }
 
         if (selectedEntity != nullptr) {
             ImGui::Text("Name");
@@ -283,26 +237,6 @@ namespace Engine {
         }
 
         ImGui::End();
-    }
-
-    void UI::DrawObjectTree(GameObject* n, int id)
-    {
-        int flags = ImGuiTreeNodeFlags_SpanFullWidth;
-        if (n->GetChildren().size() == 0) {
-            flags |= ImGuiTreeNodeFlags_Leaf;
-        }
-        if (n == selectedObject) {
-            flags |= ImGuiTreeNodeFlags_Selected;
-        }
-        if (ImGui::TreeNodeEx((n->GetName() + "###node_" + std::to_string(id)).c_str(), flags)) {
-            if (ImGui::IsItemClicked())
-            {
-                selectedObject = n;
-            }
-            for (auto child : n->GetChildren())
-                DrawObjectTree(child, id++);
-            ImGui::TreePop();
-        }
     }
 
     void UI::DrawSceneGraph(Entity* n, int id)

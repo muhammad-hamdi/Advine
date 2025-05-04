@@ -2,9 +2,9 @@
 #include "core/Scene.h"
 #include "core/Camera.h"
 #include "core/UI.h"
-#include "core/GameObject.h"
 
 #include "render/NRenderer.h"
+#include "render/SceneRenderer.h"
 
 #include <GLFW/glfw3.h>
 
@@ -19,6 +19,7 @@ namespace Engine {
         float fps = 0;
         std::string windowTitle;
         NRenderer mRenderer;
+        SceneRenderer mSceneRenderer;
 
         ::GLFWwindow* window;
         Scene* scene;
@@ -29,19 +30,17 @@ namespace Engine {
         ~Game();
 
         void Run();
-        void AddObjectToScene(GameObject* object);
         void SetActiveCamera(const std::string& name);
         inline static int state = State::Editor;
 
+        inline static int windowWidth;
+        inline static int windowHeight;
     private:
         void Initialize();
         void SetupScene();
         void Update(float deltaTime);
         void Render();
         void ProcessInput(float deltaTime);
-
-        inline static int windowWidth;
-        inline static int windowHeight;
 
         static void ResizeCallback(::GLFWwindow* window, int width, int height);
     };

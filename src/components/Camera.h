@@ -19,14 +19,14 @@ namespace Engine {
 
         glm::mat4 projectionMatrix;
 
-        bool isActive = false; // helpful if you support multiple cameras
+        bool isActive = false;
 
         glm::mat4 GetProjectionMatrix(float aspectRatio) const {
             return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
         }
 
-        glm::mat4 GetViewMatrix(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up) const {
-            return glm::lookAt(position, position + forward, up);
+        glm::mat4 GetViewMatrix() const {
+            return glm::lookAt(owner->GetWorldPosition(), owner->GetWorldPosition() + owner->transform.GetForwardDirection(), glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
         void Update(float deltaTime) override {

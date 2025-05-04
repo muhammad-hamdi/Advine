@@ -4,18 +4,42 @@
 
 namespace Engine
 {
-    GPUHandle OpenGLRenderAPI::CreateVertexDescription(const BufferLayout& layout)
+    void OpenGLRenderAPI::Clear()
+    {
+        // TODO: make this adjustable
+        GLCall(glClearColor(0.1f, 0.1f, 0.1f, 0.1f));
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    }
+
+    void OpenGLRenderAPI::SetViewport(int x, int y, int width, int height)
+    {
+        GLCall(glViewport(x, y, width, height));
+    }
+
+    void OpenGLRenderAPI::SetDepth(bool enable)
+    {
+        if(enable)
+        {
+            GLCall(glEnable(GL_DEPTH_TEST));
+        }
+        else
+        {
+            GLCall(glDisable(GL_DEPTH_TEST));
+        }
+    }
+
+    GPUHandle OpenGLRenderAPI::CreateVertexDescription(const BufferLayout &layout)
     {
         GPUHandle handle;
-        glGenVertexArrays(1, &handle);
-        glBindVertexArray(handle);
+        GLCall(glGenVertexArrays(1, &handle));
+        GLCall(glBindVertexArray(handle));
         const auto& elements = layout.GetElements();
         unsigned int offset = 0;
         for (size_t i = 0; i < elements.size(); i++)
         {
             const auto& element = elements[i];
-            glEnableVertexAttribArray(i);
-            glVertexAttribPointer(i, element.count, BufferType(element.type), element.normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (void*)offset);
+            GLCall(glEnableVertexAttribArray(i));
+            GLCall(glVertexAttribPointer(i, element.count, BufferType(element.type), element.normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (void*)offset));
             offset += element.count * BufferElementFormat::SizeOfType(element.type);
         }
         // unbind?
@@ -25,34 +49,34 @@ namespace Engine
     GPUHandle OpenGLRenderAPI::CreateVertexBuffer(uint32_t size, const void *data)
     {
         GPUHandle handle;
-        glGenBuffers(1, &handle);
-        glBindBuffer(GL_ARRAY_BUFFER, handle);
-        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // hoist STATIC_DRAW to arguments?
+        GLCall(glGenBuffers(1, &handle));
+        GLCall(glBindBuffer(GL_ARRAY_BUFFER, handle));
+        GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW)); // hoist STATIC_DRAW to arguments?
         return handle;
     }
 
     GPUHandle OpenGLRenderAPI::CreateIndexBuffer(uint32_t size, const void *data)
     {
         GPUHandle handle;
-        glGenBuffers(1, &handle);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // hoist STATIC_DRAW to arguments?
+        GLCall(glGenBuffers(1, &handle));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle));
+        GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW)); // hoist STATIC_DRAW to arguments?
         return handle;
     }
 
     void OpenGLRenderAPI::BindVertexDescription(GPUHandle handle)
     {
-        glBindVertexArray(handle);
+        GLCall(glBindVertexArray(handle));
     }
 
     void OpenGLRenderAPI::BindVertexBuffer(GPUHandle handle)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, handle);
+        GLCall(glBindBuffer(GL_ARRAY_BUFFER, handle));
     }
 
     void OpenGLRenderAPI::BindIndexBuffer(GPUHandle handle)
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle));
     }
 
     GPUHandle OpenGLRenderAPI::CreateFramebuffer()
@@ -233,6 +257,6 @@ namespace Engine
 
     void OpenGLRenderAPI::DrawIndexed(uint32_t indexCount)
     {
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        GLCall(glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0));
     }
 } // namespace ae

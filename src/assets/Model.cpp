@@ -10,9 +10,7 @@
 
 namespace Engine {
     void Model::SetMaterial(Material* mat) {
-        for (Mesh& mesh : meshes) {
-            mesh.SetMaterial(mat);
-        }
+
     }
 
     Entity* Model::LoadAssimp(const std::string& path) {
@@ -103,24 +101,24 @@ namespace Engine {
         if (auto* cached = AssetManager::GetMaterial(matName))
             return cached;
 
-        Shader* shader = AssetManager::GetShader("default");
+        NShader* shader = AssetManager::GetNShader("default");
         if (!shader)
-            shader = AssetManager::LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
+            shader = AssetManager::LoadNShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
 
         Material* material = new Material(matName, shader);
 
-        for (int i = 0; i < aiMat->GetTextureCount(aiTextureType_DIFFUSE); i++) {
+        for (size_t i = 0; i < aiMat->GetTextureCount(aiTextureType_DIFFUSE); i++) {
             aiString texPath;
             aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
             std::string fullPath = (baseDir / texPath.C_Str()).string();
-            material->diffuseTextures.push_back(AssetManager::LoadTexture(texPath.C_Str(), fullPath));
+            material->AddTexture("u_DiffuseTexture" + std::to_string(i + 1), AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
         }
 
-        for (int i = 0; i < aiMat->GetTextureCount(aiTextureType_SPECULAR); i++) {
+        for (size_t i = 0; i < aiMat->GetTextureCount(aiTextureType_SPECULAR); i++) {
             aiString texPath;
             aiMat->GetTexture(aiTextureType_SPECULAR, 0, &texPath);
             std::string fullPath = (baseDir / texPath.C_Str()).string();
-            material->specularTextures.push_back(AssetManager::LoadTexture(texPath.C_Str(), fullPath));
+            material->AddTexture("u_SpecularTexture" + std::to_string(i + 1), AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
         }
 
         AssetManager::AddMaterial(matName, material);
