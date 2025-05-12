@@ -13,14 +13,12 @@
 namespace Engine {
 
     std::unordered_map<std::string, std::unique_ptr<Model>> AssetManager::models;
-    std::unordered_map<std::string, std::unique_ptr<Shader>> AssetManager::shaders;
-    std::unordered_map<std::string, std::unique_ptr<Texture>> AssetManager::textures;
     std::unordered_map<std::string, std::unique_ptr<Material>> AssetManager::materials;
     std::unordered_map<std::string, std::unique_ptr<NShader>> AssetManager::nShaders;
     std::unordered_map<std::string, std::unique_ptr<NTexture>> AssetManager::nTextures;
 
     void AssetManager::Init() {
-        Shader* defaultShader = LoadShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
+        NShader* defaultShader = LoadNShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
         defaultMaterial = new Material("default", defaultShader);
     }
 
@@ -35,35 +33,17 @@ namespace Engine {
         return models[name].get();
     }
 
-    Shader* AssetManager::LoadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath) {
-        auto it = shaders.find(name);
-        if (it != shaders.end()) {
-            printf("INFO: Loaded Default Shader");
-            return it->second.get();
-        }
-        auto shader = std::make_unique<Shader>(vertexPath.c_str(), fragmentPath.c_str());
-        shaders[name] = std::move(shader);
-        return shaders[name].get();
-    }
-
-    Texture* AssetManager::LoadTexture(const std::string& name, const std::string& path) {
-        auto it = textures.find(name);
-        if (it != textures.end()) return it->second.get();
-
-        auto texture = std::make_unique<Texture>(path);
-        textures[name] = std::move(texture);
-        return textures[name].get();
-    }
-
     Material* AssetManager::LoadMaterial(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath, const std::string& texturePath) {
         if (materials.find(name) != materials.end()) {
             return materials[name].get();
         }
 
-        Shader* shader = LoadShader(vertexPath + fragmentPath, vertexPath, fragmentPath);
-        Texture* texture = LoadTexture(texturePath, texturePath);
+        NShader* shader = LoadNShader(vertexPath + fragmentPath, vertexPath, fragmentPath);
+        NTexture* texture = LoadNTexture(texturePath, texturePath);
         auto newMaterial = std::make_unique<Material>(name, shader);
-        newMaterial.get()->diffuseTextures.push_back(texture);
+        newMaterial->AddTexture("u_DiffuseTexture", texture);
+        // NOTE 13/5/25: this is all repurposed code for the new NShader and NTexture classes and it's not really coherent right now
+        // currently not used anywhere, will revisit this logic later when adding asset pipeline, material assets and got standarized uniforms or some shader dsl
 
         materials[name] = std::move(newMaterial);
         return materials[name].get();
@@ -81,21 +61,10 @@ namespace Engine {
         return (it != models.end()) ? it->second.get() : nullptr;
     }
 
-    Shader* AssetManager::GetShader(const std::string& name) {
-        printf("INFO: Loading Shader {%s}\n", name.c_str());
-        auto it = shaders.find(name);
-        return (it != shaders.end()) ? it->second.get() : nullptr;
-    }
-
     NShader* AssetManager::GetNShader(const std::string& name) {
         printf("INFO: Loading Shader {%s}\n", name.c_str());
         auto it = nShaders.find(name);
         return (it != nShaders.end()) ? it->second.get() : nullptr;
-    }
-
-    Texture* AssetManager::GetTexture(const std::string& name) {
-        auto it = textures.find(name);
-        return (it != textures.end()) ? it->second.get() : nullptr;
     }
 
     Material* AssetManager::GetMaterial(const std::string& name) {
@@ -110,8 +79,8 @@ namespace Engine {
 
     void AssetManager::Clear() {
         models.clear();
-        shaders.clear();
-        textures.clear();
+        nShaders.clear();
+        nTextures.clear();
     }
 
     std::string AssetManager::ExtractPathFromInclude(const std::string& include)

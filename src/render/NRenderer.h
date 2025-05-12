@@ -2,8 +2,6 @@
 #include "render/api/OpenGLRenderAPI.h"
 
 #include "rendering/LightData.h"
-#include "rendering/Material.h"
-#include "rendering/Mesh.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -18,6 +16,9 @@ namespace Engine
         glm::vec3 cameraPosition;
         float padding = 0.0f;
     };
+
+    class Mesh;
+    class Material;
 
     class NRenderer
     {

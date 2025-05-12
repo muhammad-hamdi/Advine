@@ -1,5 +1,8 @@
 #include "NRenderer.h"
 
+#include "rendering/Material.h"
+#include "rendering/Mesh.h"
+
 #include <assert.h>
 
 namespace Engine {

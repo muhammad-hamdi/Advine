@@ -4,7 +4,6 @@
 #include "core/Entity.h"
 #include "core/Context.h"
 
-#include "rendering/Renderer.h"
 #include "assets/AssetManager.h"
 
 #include "components/Camera.h"
@@ -59,11 +58,10 @@ namespace Engine {
         glfwGetWindowSize(window, &windowWidth, &windowHeight);
         mRenderer.GetAPI()->SetViewport(0, 0, windowWidth, windowHeight);
         mRenderer.GetAPI()->SetDepth(true);
+        Context::Get().SetRenderer(&mRenderer);
 
         AssetManager::Init();
         Input::Init(window);
-
-        Context::Get().SetRenderer(&mRenderer);
 
         uiManager = new UI(window);
         editorCamera = new Camera(60.0f, (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);

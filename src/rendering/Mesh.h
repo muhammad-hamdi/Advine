@@ -1,10 +1,5 @@
 #pragma once
 
-#include "assets/Shader.h"
-#include "rendering/Material.h"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
-
 #include "render/NRenderer.h"
 
 #include <glm/glm.hpp>

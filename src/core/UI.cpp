@@ -50,37 +50,38 @@ namespace Engine {
     }
 
     void DrawMaterialEditor(Material* material) {
-        for (const auto& uniform : material->GetUniformMetadata()) {
-            const std::string& name = uniform.name;
+        // NOTE 13/5/25: retiring this for now, will reintroduce later
+        // for (const auto& uniform : material->GetUniformMetadata()) {
+        //     const std::string& name = uniform.name;
 
-            // Only handle a few types for now
-            if (uniform.type == GL_FLOAT) {
-                float value = material->customUniforms[name].first.f;
-                if (ImGui::DragFloat(name.c_str(), &value)) {
-                    material->SetCustomUniform(name, value, GL_FLOAT);
-                }
-            }
-            else if (uniform.type == GL_INT) {
-                int value = material->customUniforms[name].first.i;
-                if (ImGui::DragInt(name.c_str(), &value)) {
-                    material->SetCustomUniform(name, value, GL_INT);
-                }
-            }
-            else if (uniform.type == GL_FLOAT_VEC3) {
-                glm::vec3 value = material->customUniforms[name].first.v3;
-                if (findStringIC(name, "color")) {
-                    if (ImGui::ColorEdit3(name.c_str(), glm::value_ptr(value))) {
-                        material->SetCustomUniform(name, value, GL_FLOAT_VEC3);
-                    }
-                }
-                else {
-                    if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value))) {
-                        material->SetCustomUniform(name, value, GL_FLOAT_VEC3);
-                    }
-                }
-            }
-            // Add other types as needed
-        }
+        //     // Only handle a few types for now
+        //     if (uniform.type == GL_FLOAT) {
+        //         float value = material->customUniforms[name].first.f;
+        //         if (ImGui::DragFloat(name.c_str(), &value)) {
+        //             material->SetCustomUniform(name, value, GL_FLOAT);
+        //         }
+        //     }
+        //     else if (uniform.type == GL_INT) {
+        //         int value = material->customUniforms[name].first.i;
+        //         if (ImGui::DragInt(name.c_str(), &value)) {
+        //             material->SetCustomUniform(name, value, GL_INT);
+        //         }
+        //     }
+        //     else if (uniform.type == GL_FLOAT_VEC3) {
+        //         glm::vec3 value = material->customUniforms[name].first.v3;
+        //         if (findStringIC(name, "color")) {
+        //             if (ImGui::ColorEdit3(name.c_str(), glm::value_ptr(value))) {
+        //                 material->SetCustomUniform(name, value, GL_FLOAT_VEC3);
+        //             }
+        //         }
+        //         else {
+        //             if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value))) {
+        //                 material->SetCustomUniform(name, value, GL_FLOAT_VEC3);
+        //             }
+        //         }
+        //     }
+        //     // Add other types as needed
+        // }
     }
 
     void UI::ShowGameObjectEditor(Scene* scene)
@@ -203,15 +204,10 @@ namespace Engine {
                             ImGui::Text(mat->name.c_str());
                             ImGui::Checkbox("Is Lit", &mat->isLit);
                             if (ImGui::TreeNode("Textures")) {
-                                for (int i = 0; i < mat->diffuseTextures.size(); i++) {
-                                    auto tex = mat->diffuseTextures[i];
-                                    ImGui::InputText("Diffuse##" + i, &tex->path);
-                                    ImGui::Image(tex->ID, ImVec2(__max(tex->width / 5, 256), __max(tex->height / 5, 256)));
-                                }
-                                for (int i = 0; i < mat->specularTextures.size(); i++) {
-                                    auto tex = mat->specularTextures[i];
-                                    ImGui::InputText("Specular ##" + i, &tex->path);
-                                    ImGui::Image(tex->ID, ImVec2(__max(tex->width / 5, 256), __max(tex->height / 5, 256)));
+                                int i = 0;
+                                for (auto& [name, tex]: mat->GetTextures()) {
+                                    ImGui::InputText((name + "##" + std::to_string(i++)).c_str(), &tex->filepath);
+                                    ImGui::Image(tex->handle, ImVec2(__max(tex->width / 5, 256), __max(tex->height / 5, 256)));
                                 }
                                 ImGui::TreePop();
                             }

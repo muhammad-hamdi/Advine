@@ -2,7 +2,6 @@
 
 #include "rendering/Mesh.h"
 #include "rendering/Material.h"
-#include "assets/Texture.h"
 #include "assets/AssetManager.h"
 #include "components/MeshRenderer.h"
 
