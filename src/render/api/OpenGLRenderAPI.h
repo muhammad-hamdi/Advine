@@ -35,13 +35,14 @@ namespace Engine
     class OpenGLRenderAPI : public RenderAPI
     {
     public:
-        OpenGLRenderAPI(){
+        OpenGLRenderAPI(): locations(30) {
             // viewport setting
             // depth enable
         }
         ~OpenGLRenderAPI(){}
 
         void Clear();
+        void ClearDepth();
         void SetViewport(int x, int y, int width, int height);
         void SetDepth(bool enable);
 
@@ -55,6 +56,7 @@ namespace Engine
 
         GPUHandle CreateFramebuffer();
         void BindFramebuffer(GPUHandle handle);
+        void AttachDepthBuffer(GPUHandle framebufferHandle, GPUHandle depthBufferHandle);
 
         GPUHandle CreateShader(const std::string& vertexSrc, const std::string& fragmentSrc);
         void BindShader(GPUHandle handle);
@@ -90,6 +92,6 @@ namespace Engine
         void CheckProgramLinking(GLuint shaderProgram);
 
     private:
-        std::unordered_map<std::string, GLint> locations;
+        std::vector<std::unordered_map<std::string, GLint>> locations;
     };
 } // namespace ae

@@ -37,7 +37,7 @@ namespace Engine {
         mCurrentCamera.cameraPosition = pos;
     }
 
-    void NRenderer::ApplyLightUniforms(GPUHandle shader, const std::vector<LightData>& lights)
+    void NRenderer::ApplyLightUniforms(GPUHandle shader, const std::vector<LightData>& lights, const glm::mat4 &lightSpaceMatrix)
     {
         // TODO: move to UBO
         for (int i = 0; i < lights.size(); ++i) {
@@ -58,6 +58,8 @@ namespace Engine {
 
         api->SetUniformInt(shader, "u_LightCount", static_cast<int>(lights.size()));
         api->SetUniformInt(shader, "u_IsLit", true);
+
+        api->SetUniformMat4(shader, "u_LightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
     }
 
     void NRenderer::BeginFrame()
@@ -77,8 +79,10 @@ namespace Engine {
         // Bind the shader
         api->BindShader(shader);
 
+        api->SetUniformInt(shader, "u_ShadowMap", 0);
+
         // Bind the textures
-        int slot = 0;
+        int slot = 1;
         for (auto& [name, texture] : material.GetTextures()) {
             api->BindTexture(texture->handle, slot);
             api->SetUniformInt(shader, name, slot++);
@@ -102,7 +106,7 @@ namespace Engine {
         api->DrawIndexed(mesh.GetIndexCount());
 
         // Cleanup
-        slot = 0;
+        slot = 1;
         for (auto& [name, texture] : material.GetTextures()) {
             api->BindTexture(0, slot++);
             api->SetUniformInt(shader, name, -1);

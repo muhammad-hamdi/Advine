@@ -42,6 +42,7 @@ namespace Engine
         // === Framebuffers ===
         virtual GPUHandle CreateFramebuffer() = 0;
         virtual void BindFramebuffer(GPUHandle handle) = 0;
+        virtual void AttachDepthBuffer(GPUHandle framebufferHandle, GPUHandle depthBufferHandle) = 0;
 
         // === Shaders ===
         virtual GPUHandle CreateShader(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
@@ -66,6 +67,7 @@ namespace Engine
         virtual void DrawIndexed(uint32_t indexCount) = 0;
 
         virtual void Clear() = 0;
+        virtual void ClearDepth() = 0;
         virtual void SetViewport(int x, int y, int width, int height) = 0;
         virtual void SetDepth(bool enable) = 0;
 

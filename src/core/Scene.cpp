@@ -200,6 +200,17 @@ namespace Engine {
         return activeCameraEntity;
     }
 
+    Entity *Scene::GetDirectionalLightEntity() const
+    {
+        for(auto *entitiy: entities) {
+            if(auto lc = entitiy->GetComponent<LightComponent>()) {
+                if(lc->type == LightType::Directional)
+                    return entitiy;
+            }
+        }
+        return nullptr;
+    }
+
     Entity* Scene::CreateEntity(const std::string& name)
     {
         Entity* entity = new Entity();

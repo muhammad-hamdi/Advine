@@ -20,3 +20,7 @@ struct Light {
 #define MAX_LIGHTS 16
 uniform Light u_Lights[MAX_LIGHTS];
 uniform int u_LightCount;
+
+uniform mat4 u_LightSpaceMatrix;
+
+uniform sampler2D u_ShadowMap;

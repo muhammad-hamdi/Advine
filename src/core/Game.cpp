@@ -59,11 +59,13 @@ namespace Engine {
         mRenderer.GetAPI()->SetViewport(0, 0, windowWidth, windowHeight);
         mRenderer.GetAPI()->SetDepth(true);
         Context::Get().SetRenderer(&mRenderer);
+        Context::Get().SetWindowDims(windowWidth, windowHeight);
+        mSceneRenderer.Init();
 
         AssetManager::Init();
         Input::Init(window);
 
-        uiManager = new UI(window);
+        uiManager = new UI(window, &mSceneRenderer);
         editorCamera = new Camera(60.0f, (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
         SetupScene();
     }
@@ -107,6 +109,7 @@ namespace Engine {
         windowWidth = width;
         windowHeight = height;
         Context::Get().GetRenderer()->GetAPI()->SetViewport(0, 0, windowWidth, windowHeight);
+        Context::Get().SetWindowDims(windowWidth, windowHeight);
     }
 
     void Game::Update(float deltaTime) {
@@ -134,9 +137,7 @@ namespace Engine {
     }
 
     void Game::Render() {
-        mRenderer.BeginFrame();
         mSceneRenderer.Render(scene);
-        mRenderer.EndFrame();
 
         uiManager->StartFrame();
         uiManager->ShowGameObjectEditor(scene);

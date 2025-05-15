@@ -19,6 +19,7 @@ namespace Engine {
 
     void AssetManager::Init() {
         NShader* defaultShader = LoadNShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
+        LoadNShader("simple_depth_shader", "assets/shaders/simple_depth_shader.vert", "assets/shaders/empty.frag");
         defaultMaterial = new Material("default", defaultShader);
     }
 
@@ -62,7 +63,6 @@ namespace Engine {
     }
 
     NShader* AssetManager::GetNShader(const std::string& name) {
-        printf("INFO: Loading Shader {%s}\n", name.c_str());
         auto it = nShaders.find(name);
         return (it != nShaders.end()) ? it->second.get() : nullptr;
     }

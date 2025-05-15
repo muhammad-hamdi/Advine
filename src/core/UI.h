@@ -2,6 +2,8 @@
 #include "core/Scene.h"
 #include "core/Entity.h"
 
+#include "render/SceneRenderer.h"
+
 struct GLFWwindow;
 
 namespace Engine {
@@ -9,7 +11,7 @@ namespace Engine {
 
     class UI {
     public:
-        UI(::GLFWwindow* window);
+        UI(::GLFWwindow* window, SceneRenderer* sceneRenderer);
         ~UI();
 
         static const int imguiPanelWidth = 300;
@@ -24,5 +26,6 @@ namespace Engine {
 
     private:
         ::GLFWwindow* window;
+        SceneRenderer* sceneRenderer;
     };
 }

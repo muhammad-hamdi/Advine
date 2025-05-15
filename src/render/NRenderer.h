@@ -32,8 +32,10 @@ namespace Engine
 
         std::shared_ptr<RenderAPI> GetAPI();
 
+        inline CameraData GetCamera() const { return mCurrentCamera; };
         void SetCamera(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& pos);
-        void ApplyLightUniforms(GPUHandle shader, const std::vector<LightData>& lights);
+        void ApplyLightUniforms(GPUHandle shader, const std::vector<LightData> &lights, const glm::mat4 &lightSpaceMatrix);
+        void ApplyLightUniforms(GPUHandle shader, const std::vector<LightData> &lights);
 
         void BeginFrame();
         void EndFrame();

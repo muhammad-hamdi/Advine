@@ -11,6 +11,11 @@ namespace Engine
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
+    void OpenGLRenderAPI::ClearDepth()
+    {
+        GLCall(glClear(GL_DEPTH_BUFFER_BIT));
+    }
+
     void OpenGLRenderAPI::SetViewport(int x, int y, int width, int height)
     {
         GLCall(glViewport(x, y, width, height));
@@ -91,6 +96,15 @@ namespace Engine
         glBindFramebuffer(GL_FRAMEBUFFER, handle);
     }
 
+    void OpenGLRenderAPI::AttachDepthBuffer(GPUHandle framebufferHandle, GPUHandle depthBufferHandle)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferHandle);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBufferHandle, 0);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+    }
+
     void OpenGLRenderAPI::CheckShaderCompilation(GLuint shader, const std::string& shaderType) {
         GLint success;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -149,8 +163,8 @@ namespace Engine
     void OpenGLRenderAPI::SetUniformInt(GPUHandle handle, const std::string &name, int value)
     {
         GLint loc;
-        if(locations.find(name) != locations.end()) {
-            loc = locations[name];
+        if(locations[handle].find(name) != locations[handle].end()) {
+            loc = locations[handle][name];
         } else {
             loc = glGetUniformLocation(handle, name.c_str());
         }
@@ -160,8 +174,8 @@ namespace Engine
     void OpenGLRenderAPI::SetUniformFloat(GPUHandle handle, const std::string &name, float value)
     {
         GLint loc;
-        if(locations.find(name) != locations.end()) {
-            loc = locations[name];
+        if(locations[handle].find(name) != locations[handle].end()) {
+            loc = locations[handle][name];
         } else {
             loc = glGetUniformLocation(handle, name.c_str());
         }
@@ -171,8 +185,8 @@ namespace Engine
     void OpenGLRenderAPI::SetUniformVec3(GPUHandle handle, const std::string &name, const float *vec3)
     {
         GLint loc;
-        if(locations.find(name) != locations.end()) {
-            loc = locations[name];
+        if(locations[handle].find(name) != locations[handle].end()) {
+            loc = locations[handle][name];
         } else {
             loc = glGetUniformLocation(handle, name.c_str());
         }
@@ -182,8 +196,8 @@ namespace Engine
     void OpenGLRenderAPI::SetUniformMat4(GPUHandle handle, const std::string &name, const float *mat4)
     {
         GLint loc;
-        if(locations.find(name) != locations.end()) {
-            loc = locations[name];
+        if(locations[handle].find(name) != locations[handle].end()) {
+            loc = locations[handle][name];
         } else {
             loc = glGetUniformLocation(handle, name.c_str());
         }
@@ -242,9 +256,13 @@ namespace Engine
         GPUHandle texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
         return texture;
     }

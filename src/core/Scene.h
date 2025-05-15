@@ -35,6 +35,7 @@ namespace Engine {
         void SetActiveCamera(Entity* entity);
         Camera* GetActiveCamera() const;
         Entity* GetActiveCameraEntity() const;
+        Entity* GetDirectionalLightEntity() const;
         Entity* CreateEntity(const std::string& name);
         void AddEntity(Entity* entity);
 

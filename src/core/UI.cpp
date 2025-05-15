@@ -16,7 +16,7 @@
 #include <math.h>
 
 namespace Engine {
-    UI::UI(::GLFWwindow* window) : window(window)
+    UI::UI(::GLFWwindow* window, SceneRenderer* sceneRenderer) : window(window), sceneRenderer(sceneRenderer)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -199,11 +199,11 @@ namespace Engine {
                     if (ImGui::TreeNode("MeshRenderer")) {
                         for (int i = 0; i < mr->meshes.size(); i++) {
                             auto mat = mr->materials[i];
-                            ImGui::Text("Material:");
+                            ImGui::Text(std::string("Material:##").append(std::to_string(i)).c_str());
                             ImGui::SameLine();
                             ImGui::Text(mat->name.c_str());
-                            ImGui::Checkbox("Is Lit", &mat->isLit);
-                            if (ImGui::TreeNode("Textures")) {
+                            ImGui::Checkbox(std::string("Is Lit##").append(std::to_string(i)).c_str(), &mat->isLit);
+                            if (ImGui::TreeNode(std::string("Textures##").append(std::to_string(i)).c_str())) {
                                 int i = 0;
                                 for (auto& [name, tex]: mat->GetTextures()) {
                                     ImGui::InputText((name + "##" + std::to_string(i++)).c_str(), &tex->filepath);
@@ -233,6 +233,11 @@ namespace Engine {
         }
 
         ImGui::End();
+
+
+        // ImGui::Begin("Depth Buffer", NULL, windowFlags);
+        //     ImGui::Image(sceneRenderer->GetDepthMap(), ImVec2(256, 256));
+        // ImGui::End();
     }
 
     void UI::DrawSceneGraph(Entity* n, int id)
