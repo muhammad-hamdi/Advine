@@ -27,7 +27,7 @@ namespace Engine
 #pragma region lightDepthBuffer render pass
         api->SetViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         api->BindFramebuffer(depthFramebuffer);
-        api->ClearDepth();
+        api->Clear(CLEAR_DEPTH);
 
         auto lightEnt = scene->GetDirectionalLightEntity();
         float near_plane = 1.0f, far_plane = 100.0f, orthoSize = 30.0f;
@@ -51,9 +51,12 @@ namespace Engine
 
         api->SetViewport(0, 0, window.first, window.second);
 
-        api->SetDepthMask(false);
-        glDepthFunc(GL_LEQUAL);
-        glDisable(GL_CULL_FACE);
+        RenderState skyboxState;
+        skyboxState.depthFunc = DepthFunc::Lequal;
+        skyboxState.cullMode = CullMode::None;
+        skyboxState.depthWrite = false;
+        api->ApplyRenderState(skyboxState);
+
         auto sbShader = AssetManager::GetNShader("skybox_shader")->handle;
         api->BindShader(sbShader);
         api->SetUniformMat4(sbShader, "u_View", glm::value_ptr(glm::mat4(glm::mat3(renderer->GetCamera().view))));
@@ -63,8 +66,9 @@ namespace Engine
         api->BindTextureCubemap(AssetManager::GetNTexture("skybox")->handle);
         api->SetUniformInt(sbShader, "skybox", 0);
         api->Draw(36);
-        glDepthFunc(GL_LESS);
-        api->SetDepthMask(true);
+
+        RenderState defaultState;
+        api->ApplyRenderState(defaultState);
 
         api->BindTexture2D(depthMap, 0);
         lightsToRender.clear();

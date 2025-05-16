@@ -42,11 +42,15 @@ namespace Engine
         ~OpenGLRenderAPI(){}
 
         void Clear();
+        void Clear(ClearFlags flags, float* rgba = nullptr);
         void ClearDepth();
         void SetViewport(int x, int y, int width, int height);
         void SetDepth(bool enable);
 
         void SetDepthMask(bool enable);
+
+        void ApplyRenderState(const RenderState& state);
+
 
         GPUHandle CreateVertexDescription(const BufferLayout& layout);
         GPUHandle CreateVertexBuffer(uint32_t size, const void* data);

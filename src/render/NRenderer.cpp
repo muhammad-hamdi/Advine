@@ -64,7 +64,8 @@ namespace Engine {
 
     void NRenderer::BeginFrame()
     {
-        api->Clear();
+        float color[] = {0.2f, 0.3f, 0.3f, 1.0f};
+        api->Clear(CLEAR_COLOR | CLEAR_DEPTH, color);
     }
 
     void NRenderer::EndFrame()

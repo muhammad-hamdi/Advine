@@ -117,7 +117,7 @@ namespace Engine {
         if (state == State::Editor) {
             editorCamera->Update(deltaTime);
             if (windowHeight > 0) {
-                editorCamera->SetProjectionMatrix(45.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
+                editorCamera->SetProjectionMatrix(60.0f, (float)windowWidth / windowHeight, 0.1f, 100.0f);
                 mRenderer.SetCamera(editorCamera->GetViewMatrix(), editorCamera->GetProjectionMatrix(), editorCamera->GetPosition());
             }
         }

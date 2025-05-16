@@ -11,6 +11,27 @@ namespace Engine
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
+    void OpenGLRenderAPI::Clear(ClearFlags flags, float* rgba) {
+        GLbitfield glFlags = 0;
+
+        if (flags & CLEAR_COLOR) {
+            glFlags |= GL_COLOR_BUFFER_BIT;
+            static const float defaultColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+            const float* color = rgba ? rgba : defaultColor;
+            glClearColor(color[0], color[1], color[2], color[3]);
+        }
+        if (flags & CLEAR_DEPTH) {
+            glFlags |= GL_DEPTH_BUFFER_BIT;
+        }
+        if (flags & CLEAR_STENCIL) {
+            glFlags |= GL_STENCIL_BUFFER_BIT;
+        }
+
+        if (glFlags != 0) {
+            glClear(glFlags);
+        }
+    }
+
     void OpenGLRenderAPI::ClearDepth()
     {
         GLCall(glClear(GL_DEPTH_BUFFER_BIT));
@@ -42,6 +63,51 @@ namespace Engine
         else
         {
             GLCall(glDepthMask(GL_FALSE));
+        }
+    }
+
+    static GLenum ToGLDepthFunc(DepthFunc func) {
+        switch (func) {
+            case DepthFunc::Less: return GL_LESS;
+            case DepthFunc::Lequal: return GL_LEQUAL;
+            case DepthFunc::Equal: return GL_EQUAL;
+            case DepthFunc::Greater: return GL_GREATER;
+            case DepthFunc::Gequal : return GL_GEQUAL;
+            case DepthFunc::NotEqual : return GL_NOTEQUAL;
+            case DepthFunc::Always : return GL_ALWAYS;
+            case DepthFunc::Never : return GL_NEVER;
+            default: return GL_LESS;
+        }
+    }
+
+    void OpenGLRenderAPI::ApplyRenderState(const RenderState &state)
+    {
+        // Depth test
+        if (state.depthTest)
+            glEnable(GL_DEPTH_TEST);
+        else
+            glDisable(GL_DEPTH_TEST);
+
+        glDepthMask(state.depthWrite ? GL_TRUE : GL_FALSE);
+        glDepthFunc(ToGLDepthFunc(state.depthFunc));
+
+        // Culling
+        if (state.cullMode == CullMode::None) {
+            glDisable(GL_CULL_FACE);
+        } else {
+            glEnable(GL_CULL_FACE);
+            glCullFace(state.cullMode == CullMode::Back ? GL_BACK : GL_FRONT);
+        }
+
+        // Blending
+        if (state.blend == BlendMode::Alpha) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        } else if (state.blend == BlendMode::Additive) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE);
+        } else {
+            glDisable(GL_BLEND);
         }
     }
 

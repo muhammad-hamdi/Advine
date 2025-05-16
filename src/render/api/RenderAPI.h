@@ -5,6 +5,7 @@
 #include <string>
 
 #include "BufferLayout.h"
+#include "RenderState.h"
 
 namespace Engine
 {
@@ -14,6 +15,17 @@ namespace Engine
         OpenGL,
         Vulkan // To Implement Later
     };
+
+    enum ClearFlags : uint8_t {
+        CLEAR_NONE   = 0,
+        CLEAR_COLOR  = 1 << 0,
+        CLEAR_DEPTH  = 1 << 1,
+        CLEAR_STENCIL= 1 << 2
+    };
+
+    inline ClearFlags operator|(ClearFlags a, ClearFlags b) {
+        return static_cast<ClearFlags>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+    }
 
     class RenderAPI
     {
@@ -72,10 +84,13 @@ namespace Engine
         virtual void DrawIndexed(uint32_t indexCount) = 0;
 
         virtual void Clear() = 0;
+        virtual void Clear(ClearFlags flags, float* rgba = nullptr) = 0;
         virtual void ClearDepth() = 0;
         virtual void SetViewport(int x, int y, int width, int height) = 0;
         virtual void SetDepth(bool enable) = 0;
         virtual void SetDepthMask(bool enable) = 0;
+
+        virtual void ApplyRenderState(const RenderState& state) = 0;
 
         virtual ~RenderAPI() = default;
 
