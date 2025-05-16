@@ -46,6 +46,8 @@ namespace Engine
         void SetViewport(int x, int y, int width, int height);
         void SetDepth(bool enable);
 
+        void SetDepthMask(bool enable);
+
         GPUHandle CreateVertexDescription(const BufferLayout& layout);
         GPUHandle CreateVertexBuffer(uint32_t size, const void* data);
         GPUHandle CreateIndexBuffer(uint32_t size, const void* data);
@@ -72,8 +74,14 @@ namespace Engine
         GPUHandle CreateTexture2D(uint32_t width, uint32_t height, const void* data, int channels = 4);
         GPUHandle CreateTextureRGB(uint32_t width, uint32_t height);
         GPUHandle CreateTextureDepth(uint32_t width, uint32_t height);
-        void BindTexture(GPUHandle handle, uint32_t slot = 0);
+        void BindTexture2D(GPUHandle handle, uint32_t slot = 0);
 
+        
+        GPUHandle CreateTextureCubemap();
+        void BindTextureCubemap(GPUHandle handle);
+        void AddTextureCubemapFace(GPUHandle cubemapTexture, uint32_t width, uint32_t height, const void *data, int channels, int i);
+        
+        void Draw(uint32_t count);
         void DrawIndexed(uint32_t indexCount);
     private:
         uint32_t BufferType(BufferDataType type) {

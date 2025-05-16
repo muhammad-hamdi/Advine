@@ -84,7 +84,7 @@ namespace Engine {
         // Bind the textures
         int slot = 1;
         for (auto& [name, texture] : material.GetTextures()) {
-            api->BindTexture(texture->handle, slot);
+            api->BindTexture2D(texture->handle, slot);
             api->SetUniformInt(shader, name, slot++);
         }
 
@@ -108,7 +108,7 @@ namespace Engine {
         // Cleanup
         slot = 1;
         for (auto& [name, texture] : material.GetTextures()) {
-            api->BindTexture(0, slot++);
+            api->BindTexture2D(0, slot++);
             api->SetUniformInt(shader, name, -1);
         }
     }

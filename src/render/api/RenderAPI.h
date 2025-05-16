@@ -62,14 +62,20 @@ namespace Engine
         virtual GPUHandle CreateTexture2D(uint32_t width, uint32_t height, const void* data, int channels = 4) = 0;
         virtual GPUHandle CreateTextureRGB(uint32_t width, uint32_t height) = 0;
         virtual GPUHandle CreateTextureDepth(uint32_t width, uint32_t height) = 0;
-        virtual void BindTexture(GPUHandle handle, uint32_t slot = 0) = 0;
+        virtual void BindTexture2D(GPUHandle handle, uint32_t slot = 0) = 0;
 
+        virtual GPUHandle CreateTextureCubemap() = 0;
+        virtual void BindTextureCubemap(GPUHandle handle)  = 0;
+        virtual void AddTextureCubemapFace(GPUHandle cubemapTexture, uint32_t width, uint32_t height, const void *data, int channels, int i) = 0;
+
+        virtual void Draw(uint32_t count) = 0;
         virtual void DrawIndexed(uint32_t indexCount) = 0;
 
         virtual void Clear() = 0;
         virtual void ClearDepth() = 0;
         virtual void SetViewport(int x, int y, int width, int height) = 0;
         virtual void SetDepth(bool enable) = 0;
+        virtual void SetDepthMask(bool enable) = 0;
 
         virtual ~RenderAPI() = default;
 

@@ -33,6 +33,8 @@ namespace Engine {
     public:
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 
+        Mesh(float *verts, int count, BufferLayout layout);
+
         inline GPUHandle GetVertexBufferHandle()      const { return vertexBuffer; }
         inline GPUHandle GetIndexBufferHandle()       const { return indexBuffer; }
         inline GPUHandle GetVertexDescriptionHandle() const { return vertexDescription; }

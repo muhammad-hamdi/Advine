@@ -1,5 +1,6 @@
 #include "core/Scene.h"
 
+#include "assets/AssetManager.h"
 #include "rendering/LightData.h"
 #include "components/Camera.h"
 #include "components/LightComponent.h"
@@ -119,6 +120,12 @@ namespace Engine {
         Model loader;
 
         entities = LoadEntitesFromJson(sceneJson["entities"], loader, nullptr);
+
+        if(sceneJson["properties"]["skybox"]) {
+            BufferLayout bl;
+            bl.Push<float>(3);
+            mSkyboxMesh = new Mesh(AssetManager::GetDefaultCubeVerts(), 36*3, bl);
+        }
     }
 
     bool HasAuthoredDescendant(Entity* entity) {

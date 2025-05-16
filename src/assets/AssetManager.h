@@ -27,14 +27,19 @@ namespace Engine {
         static Material* GetDefaultMaterial();
 
         static void Clear();
-
+        
         // new loaders
-
+        
         static std::string ExtractPathFromInclude(const std::string& include);
         static std::string LoadShaderSource(const std::string& path, std::unordered_set<std::string>& included);
         static NShader* LoadNShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
         static NTexture* LoadNTexture(const std::string& name, const std::string& path);
+        static NTexture *LoadCubemap(const std::string &name, std::vector<std::string> faces);
         static NShader *GetNShader(const std::string &name);
+        static NTexture *GetNTexture(const std::string &name);
+
+
+        static float *GetDefaultCubeVerts();
     private:
         static std::unordered_map<std::string, std::unique_ptr<Model>> models;
         static std::unordered_map<std::string, std::unique_ptr<Material>> materials;

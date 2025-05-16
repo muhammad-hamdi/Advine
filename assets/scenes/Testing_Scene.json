@@ -1,4 +1,7 @@
 {
+    "properties": {
+        "skybox": true
+    },
     "entities": [
         {
             "modelPath": "assets/models/sonic_the_hedgehog_running/scene.gltf",

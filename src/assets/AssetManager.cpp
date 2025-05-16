@@ -20,6 +20,17 @@ namespace Engine {
     void AssetManager::Init() {
         NShader* defaultShader = LoadNShader("default", "assets/shaders/default.vert", "assets/shaders/default.frag");
         LoadNShader("simple_depth_shader", "assets/shaders/simple_depth_shader.vert", "assets/shaders/empty.frag");
+        LoadNShader("skybox_shader", "assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
+        std::vector<std::string> faces
+        {
+            "assets/textures/skybox/right.png",
+            "assets/textures/skybox/left.png",
+            "assets/textures/skybox/top.png",
+            "assets/textures/skybox/bottom.png",
+            "assets/textures/skybox/front.png",
+            "assets/textures/skybox/back.png"
+        };
+        LoadCubemap("skybox", faces);
         defaultMaterial = new Material("default", defaultShader);
     }
 
@@ -65,6 +76,11 @@ namespace Engine {
     NShader* AssetManager::GetNShader(const std::string& name) {
         auto it = nShaders.find(name);
         return (it != nShaders.end()) ? it->second.get() : nullptr;
+    }
+
+    NTexture* AssetManager::GetNTexture(const std::string& name) {
+        auto it = nTextures.find(name);
+        return (it != nTextures.end()) ? it->second.get() : nullptr;
     }
 
     Material* AssetManager::GetMaterial(const std::string& name) {
@@ -132,6 +148,7 @@ namespace Engine {
 
         return output.str();
     }
+    
     NShader *AssetManager::LoadNShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath)
     {
         auto it = nShaders.find(name);
@@ -156,6 +173,7 @@ namespace Engine {
     {
         auto it = nTextures.find(name);
         if (it != nTextures.end()) return it->second.get();
+        std::cout << "Loading texture: " << path << std::endl;
 
         auto api = Context::Get().GetRenderer()->GetAPI();
         auto texture = std::make_unique<NTexture>();
@@ -173,5 +191,84 @@ namespace Engine {
 
         nTextures[name] = std::move(texture);
         return nTextures[name].get();
+    }
+
+    NTexture *AssetManager::LoadCubemap(const std::string &name, std::vector<std::string> faces)
+    {
+        auto it = nTextures.find(name);
+        if (it != nTextures.end()) return it->second.get();
+
+        auto api = Context::Get().GetRenderer()->GetAPI();
+        auto texture = std::make_unique<NTexture>();
+
+        texture->handle = api->CreateTextureCubemap();
+
+        for (unsigned int i = 0; i < faces.size(); i++)
+        {
+            unsigned char *data = stbi_load(faces[i].c_str(), &texture->width, &texture->height, &texture->channels, 0);
+            if (data)
+            {
+                api->AddTextureCubemapFace(texture->handle, texture->width, texture->height, data, texture->channels, i);
+                stbi_image_free(data);
+            }
+            else
+            {
+                std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+                stbi_image_free(data);
+            }
+            if(stbi_failure_reason())
+                std::cout << stbi_failure_reason() << std::endl;
+        }
+
+        nTextures[name] = std::move(texture);
+        return nTextures[name].get();
+    }
+
+    float* AssetManager::GetDefaultCubeVerts() {
+        static float vertices[] = {
+            // positions          
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+        
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+        
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+        
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+        
+            -1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+        
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f
+        };
+        return vertices;
     }
 }

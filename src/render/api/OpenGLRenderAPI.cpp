@@ -33,6 +33,18 @@ namespace Engine
         }
     }
 
+    void OpenGLRenderAPI::SetDepthMask(bool enable)
+    {
+        if(enable)
+        {
+            GLCall(glDepthMask(GL_TRUE));
+        }
+        else
+        {
+            GLCall(glDepthMask(GL_FALSE));
+        }
+    }
+
     GPUHandle OpenGLRenderAPI::CreateVertexDescription(const BufferLayout &layout)
     {
         GPUHandle handle;
@@ -239,6 +251,29 @@ namespace Engine
         return textureHandle;
     }
 
+    GPUHandle OpenGLRenderAPI::CreateTextureCubemap() {
+        GPUHandle textureHandle;
+        glGenTextures(1, &textureHandle);
+        glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        return textureHandle;
+    }
+
+    void OpenGLRenderAPI::BindTextureCubemap(GPUHandle handle) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
+    }
+
+    void OpenGLRenderAPI::AddTextureCubemapFace(GPUHandle cubemapTexture, uint32_t width, uint32_t height, const void *data, int channels, int i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+
+
     GPUHandle OpenGLRenderAPI::CreateTextureRGB(uint32_t width, uint32_t height)
     {
         GPUHandle texture;
@@ -267,10 +302,15 @@ namespace Engine
         return texture;
     }
 
-    void OpenGLRenderAPI::BindTexture(GPUHandle handle, uint32_t slot)
+    void OpenGLRenderAPI::BindTexture2D(GPUHandle handle, uint32_t slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, handle);
+    }
+
+    void OpenGLRenderAPI::Draw(uint32_t count)
+    {
+        GLCall(glDrawArrays(GL_TRIANGLES, 0, count););
     }
 
     void OpenGLRenderAPI::DrawIndexed(uint32_t indexCount)

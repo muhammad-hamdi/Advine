@@ -38,8 +38,9 @@ namespace Engine {
         Entity* GetDirectionalLightEntity() const;
         Entity* CreateEntity(const std::string& name);
         void AddEntity(Entity* entity);
-
-        void Render(const Camera& camera);
+        
+        inline Mesh* GetSkyboxMesh() const { return mSkyboxMesh; };
+        
         void Update(float deltaTime);
 
         template<typename T, typename Predicate>
@@ -66,6 +67,7 @@ namespace Engine {
         LightData mainDirectionalLight;
         std::map<std::string, Camera*> cameras;  // Store cameras by name
         Camera* activeCamera = nullptr;          // The active camera
+        Mesh* mSkyboxMesh;
 
         std::string filepath;
         std::string name;

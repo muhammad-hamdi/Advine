@@ -50,7 +50,23 @@ namespace Engine
         renderer->BeginFrame();
 
         api->SetViewport(0, 0, window.first, window.second);
-        api->BindTexture(depthMap, 0);
+
+        api->SetDepthMask(false);
+        glDepthFunc(GL_LEQUAL);
+        glDisable(GL_CULL_FACE);
+        auto sbShader = AssetManager::GetNShader("skybox_shader")->handle;
+        api->BindShader(sbShader);
+        api->SetUniformMat4(sbShader, "u_View", glm::value_ptr(glm::mat4(glm::mat3(renderer->GetCamera().view))));
+        api->SetUniformMat4(sbShader, "u_Projection", glm::value_ptr(renderer->GetCamera().projection));
+        api->BindVertexDescription(scene->GetSkyboxMesh()->GetVertexDescriptionHandle());
+        api->BindVertexBuffer(scene->GetSkyboxMesh()->GetVertexBufferHandle());
+        api->BindTextureCubemap(AssetManager::GetNTexture("skybox")->handle);
+        api->SetUniformInt(sbShader, "skybox", 0);
+        api->Draw(36);
+        glDepthFunc(GL_LESS);
+        api->SetDepthMask(true);
+
+        api->BindTexture2D(depthMap, 0);
         lightsToRender.clear();
         scene->GatherLights(lightsToRender);
 
@@ -66,6 +82,7 @@ namespace Engine
         if (mr)
             for (int i = 0; i < mr->meshes.size(); i++) {
                 if(mr->materials[i]->isLit) {
+                    // TODO: Move lighting uniform logic into Material or Renderer to avoid SceneRenderer knowing about shader internals
                     renderer->ApplyLightUniforms(mr->materials[i]->GetShaderHandle(), lightsToRender, lightSpaceMatrix);
                 }
                 renderer->SubmitMesh(*mr->meshes[i], *mr->materials[i], entity->GetWorldMatrix());

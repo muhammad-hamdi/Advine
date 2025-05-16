@@ -10,6 +10,12 @@ namespace Engine {
         // SetupMesh();
     }
 
+    Mesh::Mesh(float* verts, int count, BufferLayout layout) {
+        auto api = Context::Get().GetRenderer()->GetAPI();
+        vertexBuffer = api->CreateVertexBuffer(count * sizeof(float), verts);
+        vertexDescription = api->CreateVertexDescription(layout);
+    }
+
     void Mesh::Upload()
     {
         auto api = Context::Get().GetRenderer()->GetAPI();
