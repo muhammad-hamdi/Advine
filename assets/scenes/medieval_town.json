@@ -1,0 +1,33 @@
+{
+    "name": "medieval_town",
+    "properties": {
+        "skybox": true
+    },
+    "entities": [
+        {
+            "name": "town",
+            "modelPath": "assets/models/medieval_town/scene.gltf"
+        },
+        {
+            "name": "camera",
+            "position": [0, 8, 100],
+            "rotation": [0, -90, 0],
+            "components": [
+                {
+                    "name": "camera",
+                    "isActive": true
+                }
+            ]
+        },
+        {
+            "name": "sun",
+            "rotation": [-45, -45, 0],
+            "components": [
+                {
+                    "name": "light",
+                    "type": 0
+                }
+            ]
+        }
+    ]
+}

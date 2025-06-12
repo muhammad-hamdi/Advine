@@ -47,23 +47,30 @@ namespace Engine {
         entity->name = node->mName.C_Str();
         entity->transform = ConvertTransform(node->mTransformation);
 
-        if (node->mNumMeshes > 0) {
+        // if (node->mNumMeshes > 0) {
             MeshRenderer* renderer = entity->AddComponent<MeshRenderer>();
-            for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
-                aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+            ProcessChildren(node, scene, baseDir, renderer);
+        // }
 
-                renderer->meshes.push_back(ProcessMesh(mesh));
-                renderer->materials.push_back(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
-            }
-        }
-
-        for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-            Entity* child = ProcessNode(node->mChildren[i], scene, baseDir);
-            child->parent = entity;
-            entity->children.push_back(child);
-        }
+        // for (unsigned int i = 0; i < node->mNumChildren; ++i) {
+        //     Entity* child = ProcessNode(node->mChildren[i], scene, baseDir);
+        //     child->parent = entity;
+        //     entity->children.push_back(child);
+        // }
 
         return entity;
+    }
+
+    void Model::ProcessChildren(aiNode* parent, const aiScene* scene, const std::filesystem::path& baseDir, MeshRenderer* renderer) {
+        for (unsigned int i = 0; i < parent->mNumMeshes; ++i) {
+            aiMesh* mesh = scene->mMeshes[parent->mMeshes[i]];
+
+            renderer->meshes.push_back(ProcessMesh(mesh));
+            renderer->materials.push_back(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
+        }
+        for (unsigned int i = 0; i < parent->mNumChildren; ++i) {
+            ProcessChildren(parent->mChildren[i], scene, baseDir, renderer);
+        }
     }
 
     Mesh* Model::ProcessMesh(aiMesh* mesh) {

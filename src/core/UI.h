@@ -11,7 +11,7 @@ namespace Engine {
 
     class UI {
     public:
-        UI(::GLFWwindow* window, SceneRenderer* sceneRenderer);
+        UI(::GLFWwindow* window, SceneRenderer* sceneRenderer, Game* game);
         ~UI();
 
         static const int imguiPanelWidth = 300;
@@ -27,5 +27,6 @@ namespace Engine {
     private:
         ::GLFWwindow* window;
         SceneRenderer* sceneRenderer;
+        Game* gameRoot;
     };
 }

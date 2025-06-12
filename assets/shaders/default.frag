@@ -94,13 +94,20 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 
     // better bias when we have access to light direction
-    // vec3 lightDir = normalize(light.position - fs_in.FragPos);
+    // vec3 lightDir;
+    // for (int i = 0; i < u_LightCount; ++i) {
+    //     if (u_Lights[i].type == 0) {
+    //         lightDir = u_Lights[i].direction;
+    //         break;
+    //     }
+    // }
+    // Light light = u_Lights[directionalIndex];
     // vec3 normal = normalize(fs_in.Normal);
     // float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 
     float bias = 0.005;
     // check whether current frag pos is in shadow
-    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    float shadow = currentDepth - bias > closestDepth  ? 0.5 : 0.0;
     if(projCoords.z > 1.0)
         shadow = 0.0;
     return shadow;

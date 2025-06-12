@@ -65,7 +65,7 @@ namespace Engine {
         AssetManager::Init();
         Input::Init(window);
 
-        uiManager = new UI(window, &mSceneRenderer);
+        uiManager = new UI(window, &mSceneRenderer, this);
         editorCamera = new Camera(60.0f, (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
         SetupScene();
     }

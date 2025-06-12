@@ -16,7 +16,7 @@
 #include <math.h>
 
 namespace Engine {
-    UI::UI(::GLFWwindow* window, SceneRenderer* sceneRenderer) : window(window), sceneRenderer(sceneRenderer)
+    UI::UI(::GLFWwindow* window, SceneRenderer* sceneRenderer, Game* game) : window(window), sceneRenderer(sceneRenderer), gameRoot(game)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -233,6 +233,28 @@ namespace Engine {
         }
 
         ImGui::End();
+
+        if(ImGui::Begin("Scenes", NULL)) {
+            namespace fs = std::filesystem;
+
+            std::vector<std::string> scenes;
+
+            std::string scenesDir = "assets/scenes";
+            int i = 0;
+            static int selected = -1;
+            for (const auto & entry : fs::directory_iterator(scenesDir)) {
+                if(ImGui::Selectable(entry.path().filename().string().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+                    if (ImGui::IsMouseDoubleClicked(0)) {
+                        gameRoot->SetActiveScene(new Scene(entry.path().string()));
+                    }
+                }
+                scenes.push_back(entry.path().string());
+                std::cout << entry.path() << std::endl;
+                i++;
+            }
+            ImGui::End();
+        }
+
 
 
         // ImGui::Begin("Depth Buffer", NULL, windowFlags);

@@ -85,28 +85,28 @@ namespace Engine {
                 LoadEntitesFromJson(m["children"], loader, e);
             }
 
-            if (m.contains("overrides")) {
-                for (auto ovr : m["overrides"]) {
-                    Entity* me = e;
-                    auto path = ovr["path"];
-                    for (int i : path) {
-                        me = me->children[i];
-                    }
+            // if (m.contains("overrides")) {
+            //     for (auto ovr : m["overrides"]) {
+            //         Entity* me = e;
+            //         auto path = ovr["path"];
+            //         for (int i : path) {
+            //             me = me->children[i];
+            //         }
 
-                    if (ovr.contains("position")) {
-                        auto pos = ovr["position"];
-                        me->transform.setLocalPosition({ pos[0], pos[1], pos[2] });
-                    }
-                    if (ovr.contains("rotation")) {
-                        auto rot = ovr["rotation"];
-                        me->transform.setLocalRotation({ rot[0], rot[1], rot[2] });
-                    }
-                    if (ovr.contains("scale")) {
-                        auto scale = ovr["scale"];
-                        me->transform.setLocalScale({ scale[0], scale[1], scale[2] });
-                    }
-                }
-            }
+            //         if (ovr.contains("position")) {
+            //             auto pos = ovr["position"];
+            //             me->transform.setLocalPosition({ pos[0], pos[1], pos[2] });
+            //         }
+            //         if (ovr.contains("rotation")) {
+            //             auto rot = ovr["rotation"];
+            //             me->transform.setLocalRotation({ rot[0], rot[1], rot[2] });
+            //         }
+            //         if (ovr.contains("scale")) {
+            //             auto scale = ovr["scale"];
+            //             me->transform.setLocalScale({ scale[0], scale[1], scale[2] });
+            //         }
+            //     }
+            // }
             entityList.push_back(e);
         }
         return entityList;

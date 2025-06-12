@@ -11,6 +11,7 @@
 #include <filesystem>
 
 namespace Engine {
+    class MeshRenderer;
     class Model {
     public:
         void Draw();
@@ -21,6 +22,8 @@ namespace Engine {
         Entity* LoadAssimp(const std::string& path);
 
         Entity* ProcessNode(aiNode* node, const aiScene* scene, const std::filesystem::path& baseDir);
+
+        void ProcessChildren(aiNode *parent, const aiScene *scene, const std::filesystem::path &baseDir, MeshRenderer *renderer);
 
         Mesh* ProcessMesh(aiMesh* mesh);
 

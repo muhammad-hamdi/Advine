@@ -35,6 +35,11 @@ namespace Engine {
 
         inline static int windowWidth;
         inline static int windowHeight;
+
+        // Testing
+        void SetActiveScene(Scene* newScene) {
+            scene = newScene;
+        }
     private:
         void Initialize();
         void SetupScene();
