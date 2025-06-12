@@ -74,25 +74,37 @@ namespace Engine {
         // reserved for when adding APIs other than OpenGL
     }
 
-    void NRenderer::SubmitMesh(const Mesh &mesh, const Material &material, const glm::mat4 &transform)
+    void NRenderer::SubmitMesh(const Mesh &mesh, Material &material, const glm::mat4 &transform)
     {
         GPUHandle shader = material.GetShaderHandle();
-        // Bind the shader
-        api->BindShader(shader);
+        static GPUHandle boundShader = 0;
+        if (boundShader != shader) {
+            api->BindShader(shader);
+            api->SetUniformInt(shader, "u_ShadowMap", 0);
+            boundShader = shader;
+        }
 
-        api->SetUniformInt(shader, "u_ShadowMap", 0);
 
         // Bind the textures
-        int slot = 1;
-        for (auto& [name, texture] : material.GetTextures()) {
-            api->BindTexture2D(texture->handle, slot);
-            api->SetUniformInt(shader, name, slot++);
+        if (boundMaterial != &material) {
+            api->SetUniformInt(shader, "u_IsLit", material.isLit);
+
+            static GPUHandle boundTextures[32] = {};
+            int slot = 1;
+            for (auto& [name, texture] : material.GetTextures()) {
+                if (boundTextures[slot] != texture->handle) {
+                    api->BindTexture2D(texture->handle, slot);
+                    boundTextures[slot] = texture->handle;
+                }
+                api->SetUniformInt(shader, name, slot++);
+            }
+
+            boundMaterial = &material;
         }
 
         // TODO: move transformation matrices to UBO
         // api->UpdateUniformBuffer(material.GetTransformUBO(), &transform, sizeof(glm::mat4));
         // Upload transforms or material data
-        api->SetUniformInt(shader, "u_IsLit", material.isLit);
         api->SetUniformMat4(shader, "u_Model", glm::value_ptr(transform));
         api->SetUniformMat4(shader, "u_View", glm::value_ptr(mCurrentCamera.view));
         api->SetUniformMat4(shader, "u_Projection", glm::value_ptr(mCurrentCamera.projection));
@@ -107,10 +119,10 @@ namespace Engine {
         api->DrawIndexed(mesh.GetIndexCount());
 
         // Cleanup
-        slot = 1;
-        for (auto& [name, texture] : material.GetTextures()) {
-            api->BindTexture2D(0, slot++);
-            api->SetUniformInt(shader, name, -1);
-        }
+        // slot = 1;
+        // for (auto& [name, texture] : material.GetTextures()) {
+        //     api->BindTexture2D(0, slot++);
+        //     api->SetUniformInt(shader, name, -1);
+        // }
     }
 }

@@ -16,6 +16,12 @@ namespace Engine {
         vertexDescription = api->CreateVertexDescription(layout);
     }
 
+    void Mesh::SetMaterial(const std::string matName) {
+        material = matName;
+    }
+
+    std::string Mesh::GetMaterial() { return material; }
+
     void Mesh::Upload()
     {
         auto api = Context::Get().GetRenderer()->GetAPI();

@@ -4,6 +4,7 @@
 #include "components/Camera.h"
 #include "components/MeshRenderer.h"
 #include "components/LightComponent.h"
+#include "assets/AssetManager.h"
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -198,7 +199,7 @@ namespace Engine {
                 else if (MeshRenderer* mr = dynamic_cast<MeshRenderer*>(comp.get())) {
                     if (ImGui::TreeNode("MeshRenderer")) {
                         for (int i = 0; i < mr->meshes.size(); i++) {
-                            auto mat = mr->materials[i];
+                            auto mat = AssetManager::GetMaterial(mr->meshes[i]->GetMaterial());
                             ImGui::Text(std::string("Material:##").append(std::to_string(i)).c_str());
                             ImGui::SameLine();
                             ImGui::Text(mat->name.c_str());
@@ -237,8 +238,6 @@ namespace Engine {
         if(ImGui::Begin("Scenes", NULL)) {
             namespace fs = std::filesystem;
 
-            std::vector<std::string> scenes;
-
             std::string scenesDir = "assets/scenes";
             int i = 0;
             static int selected = -1;
@@ -248,8 +247,6 @@ namespace Engine {
                         gameRoot->SetActiveScene(new Scene(entry.path().string()));
                     }
                 }
-                scenes.push_back(entry.path().string());
-                std::cout << entry.path() << std::endl;
                 i++;
             }
             ImGui::End();

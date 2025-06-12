@@ -30,10 +30,16 @@ namespace Engine {
 
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
+
+        std::string material;
     public:
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 
         Mesh(float *verts, int count, BufferLayout layout);
+
+        void SetMaterial(const std::string matName);
+
+        std::string GetMaterial();
 
         inline GPUHandle GetVertexBufferHandle()      const { return vertexBuffer; }
         inline GPUHandle GetIndexBufferHandle()       const { return indexBuffer; }

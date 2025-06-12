@@ -85,11 +85,12 @@ namespace Engine
         MeshRenderer* mr = entity->GetComponent<MeshRenderer>();
         if (mr)
             for (int i = 0; i < mr->meshes.size(); i++) {
-                if(mr->materials[i]->isLit) {
+                Material* mat = AssetManager::GetMaterial(mr->meshes[i]->GetMaterial());
+                if(mat->isLit) {
                     // TODO: Move lighting uniform logic into Material or Renderer to avoid SceneRenderer knowing about shader internals
-                    renderer->ApplyLightUniforms(mr->materials[i]->GetShaderHandle(), lightsToRender, lightSpaceMatrix);
+                    renderer->ApplyLightUniforms(mat->GetShaderHandle(), lightsToRender, lightSpaceMatrix);
                 }
-                renderer->SubmitMesh(*mr->meshes[i], *mr->materials[i], entity->GetWorldMatrix());
+                renderer->SubmitMesh(*mr->meshes[i], *mat, entity->GetWorldMatrix());
             }
         for (auto& child : entity->children) {
             RenderEntity(child);

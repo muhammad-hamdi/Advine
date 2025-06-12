@@ -25,6 +25,7 @@ namespace Engine
     private:
         std::shared_ptr<RenderAPI> api;
         CameraData mCurrentCamera;
+        Material* boundMaterial;
     public:
         NRenderer();
         NRenderer(RenderBackend backend);
@@ -40,6 +41,6 @@ namespace Engine
         void BeginFrame();
         void EndFrame();
 
-        void SubmitMesh(const Mesh &mesh, const Material &material, const glm::mat4 &transform);
+        void SubmitMesh(const Mesh &mesh, Material &material, const glm::mat4 &transform);
     };
 } // namespace Engine

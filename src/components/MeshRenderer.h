@@ -7,6 +7,6 @@ namespace Engine {
     class MeshRenderer : public Component {
     public:
         std::vector<Mesh*> meshes;
-        std::vector<Material*> materials;
+        std::vector<std::string> materials;
     };
 }

@@ -6,6 +6,7 @@
 #include "components/MeshRenderer.h"
 
 #include <iostream>
+#include <algorithm>
 
 namespace Engine {
     void Model::SetMaterial(Material* mat) {
@@ -50,6 +51,10 @@ namespace Engine {
         // if (node->mNumMeshes > 0) {
             MeshRenderer* renderer = entity->AddComponent<MeshRenderer>();
             ProcessChildren(node, scene, baseDir, renderer);
+            //sort by material
+            std::sort(renderer->meshes.begin(), renderer->meshes.end(), [](Mesh* a, Mesh* b) {
+                return a->GetMaterial() < b->GetMaterial();
+            });
         // }
 
         // for (unsigned int i = 0; i < node->mNumChildren; ++i) {
@@ -66,7 +71,8 @@ namespace Engine {
             aiMesh* mesh = scene->mMeshes[parent->mMeshes[i]];
 
             renderer->meshes.push_back(ProcessMesh(mesh));
-            renderer->materials.push_back(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
+            renderer->meshes.back()->SetMaterial(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
+            // renderer->materials.push_back(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
         }
         for (unsigned int i = 0; i < parent->mNumChildren; ++i) {
             ProcessChildren(parent->mChildren[i], scene, baseDir, renderer);
@@ -99,13 +105,13 @@ namespace Engine {
         return new Mesh(vertices, indices);
     }
 
-    Material* Model::LoadMaterial(aiMaterial* aiMat, const std::filesystem::path& baseDir) {
+    std::string Model::LoadMaterial(aiMaterial* aiMat, const std::filesystem::path& baseDir) {
         aiString name;
         aiMat->Get(AI_MATKEY_NAME, name);
 
         std::string matName = name.C_Str();
         if (auto* cached = AssetManager::GetMaterial(matName))
-            return cached;
+            return matName;
 
         NShader* shader = AssetManager::GetNShader("default");
         if (!shader)
@@ -128,6 +134,6 @@ namespace Engine {
         }
 
         AssetManager::AddMaterial(matName, material);
-        return material;
+        return matName;
     }
 }

@@ -27,7 +27,7 @@ namespace Engine {
 
         Mesh* ProcessMesh(aiMesh* mesh);
 
-        Material* LoadMaterial(aiMaterial* aiMat, const std::filesystem::path& baseDir);
+        std::string LoadMaterial(aiMaterial* aiMat, const std::filesystem::path& baseDir);
 
     private:
         std::vector<Mesh> meshes;
