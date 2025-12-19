@@ -320,7 +320,7 @@ namespace Engine
     GPUHandle OpenGLRenderAPI::CreateTextureCubemap() {
         GPUHandle textureHandle;
         glGenTextures(1, &textureHandle);
-        glBindTexture(GL_TEXTURE_2D, textureHandle);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureHandle);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -330,8 +330,8 @@ namespace Engine
         return textureHandle;
     }
 
-    void OpenGLRenderAPI::BindTextureCubemap(GPUHandle handle) {
-        glActiveTexture(GL_TEXTURE0);
+    void OpenGLRenderAPI::BindTextureCubemap(GPUHandle handle, uint32_t slot) {
+        glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
     }
 

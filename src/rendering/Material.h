@@ -31,13 +31,15 @@ namespace Engine {
     public:
         std::string name;
 
-        // TODO: material props when no texture, and base ambience, also pass shininess for specular exponent
-        glm::vec3 ambient;
-        glm::vec3 diffuse;
-        glm::vec3 specular;
-        float shininess;
+        // PBR properties
+        glm::vec3 albedo;
+        float metallic;
+        float roughness;
+        float ao;
 
         bool isLit = true;
+
+        Material(NShader* shader) : nShader(shader) {}
 
         Material(const std::string& name, NShader* shader) : name(name), nShader(shader) {}
 

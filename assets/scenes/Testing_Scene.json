@@ -4,9 +4,31 @@
     },
     "entities": [
         {
-            "components": [],
             "modelPath": "assets/models/sonic_the_hedgehog_running/scene.gltf",
             "name": "sonic",
+            "overrides": [
+                {
+                    "path": [
+                        0,
+                        1
+                    ],
+                    "position": [
+                        4.699999809265137,
+                        6.400000095367432,
+                        -6.5
+                    ],
+                    "rotation": [
+                        -90.0,
+                        9.0,
+                        9.0
+                    ],
+                    "scale": [
+                        0.25,
+                        0.25,
+                        0.25
+                    ]
+                }
+            ],
             "position": [
                 5.400000095367432,
                 3.0999999046325684,
@@ -24,7 +46,6 @@
             ]
         },
         {
-            "components": [],
             "modelPath": "assets/models/nanosuit/nanosuit.obj",
             "name": "nanosuit",
             "position": [

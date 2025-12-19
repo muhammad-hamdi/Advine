@@ -37,6 +37,7 @@ namespace Engine
         auto shader = AssetManager::GetNShader("simple_depth_shader");
 
         api->BindShader(shader->handle);
+        api->SetUniformInt(shader->handle, "u_IsLit", false);
         api->SetUniformMat4(shader->handle, "u_LightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
 
         for (auto& entity : scene->GetEntities()) {
@@ -63,8 +64,8 @@ namespace Engine
         api->SetUniformMat4(sbShader, "u_Projection", glm::value_ptr(renderer->GetCamera().projection));
         api->BindVertexDescription(scene->GetSkyboxMesh()->GetVertexDescriptionHandle());
         api->BindVertexBuffer(scene->GetSkyboxMesh()->GetVertexBufferHandle());
-        api->BindTextureCubemap(AssetManager::GetNTexture("skybox")->handle);
-        api->SetUniformInt(sbShader, "skybox", 0);
+        api->BindTextureCubemap(AssetManager::GetNTexture("skybox")->handle, 30);
+        api->SetUniformInt(sbShader, "skybox", 30);
         api->Draw(36);
 
         RenderState defaultState;
@@ -73,6 +74,10 @@ namespace Engine
         api->BindTexture2D(depthMap, 0);
         lightsToRender.clear();
         scene->GatherLights(lightsToRender);
+
+        // Set environment map for PBR
+        api->BindTextureCubemap(AssetManager::GetNTexture("skybox")->handle, 31);
+        api->SetUniformInt(AssetManager::GetNShader("default")->handle, "u_EnvironmentMap", 31);
 
         for (auto& entity : scene->GetEntities()) {
             RenderEntity(entity);

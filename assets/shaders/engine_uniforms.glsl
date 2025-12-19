@@ -24,3 +24,4 @@ uniform int u_LightCount;
 uniform mat4 u_LightSpaceMatrix;
 
 uniform sampler2D u_ShadowMap;
+uniform samplerCube u_EnvironmentMap;

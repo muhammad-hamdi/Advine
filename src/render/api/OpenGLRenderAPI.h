@@ -82,7 +82,7 @@ namespace Engine
 
         
         GPUHandle CreateTextureCubemap();
-        void BindTextureCubemap(GPUHandle handle);
+        void BindTextureCubemap(GPUHandle handle, uint32_t slot);
         void AddTextureCubemapFace(GPUHandle cubemapTexture, uint32_t width, uint32_t height, const void *data, int channels, int i);
         
         void Draw(uint32_t count);

@@ -77,7 +77,7 @@ namespace Engine
         virtual void BindTexture2D(GPUHandle handle, uint32_t slot = 0) = 0;
 
         virtual GPUHandle CreateTextureCubemap() = 0;
-        virtual void BindTextureCubemap(GPUHandle handle)  = 0;
+        virtual void BindTextureCubemap(GPUHandle handle, uint32_t slot) = 0;
         virtual void AddTextureCubemapFace(GPUHandle cubemapTexture, uint32_t width, uint32_t height, const void *data, int channels, int i) = 0;
 
         virtual void Draw(uint32_t count) = 0;

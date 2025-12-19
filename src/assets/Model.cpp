@@ -18,7 +18,10 @@ namespace Engine {
         const aiScene* scene = importer.ReadFile(path,
             aiProcess_Triangulate |
             aiProcess_GenNormals |
-            aiProcess_JoinIdenticalVertices);
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_FindInstances |
+            aiProcess_OptimizeMeshes |
+            aiProcess_FindInvalidData);
 
         if (!scene || !scene->mRootNode) {
             std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
@@ -48,35 +51,25 @@ namespace Engine {
         entity->name = node->mName.C_Str();
         entity->transform = ConvertTransform(node->mTransformation);
 
-        // if (node->mNumMeshes > 0) {
+        if (node->mNumMeshes > 0) {
             MeshRenderer* renderer = entity->AddComponent<MeshRenderer>();
-            ProcessChildren(node, scene, baseDir, renderer);
-            //sort by material
+            for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
+                aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+                renderer->meshes.push_back(ProcessMesh(mesh));
+                renderer->meshes.back()->SetMaterial(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
+            }
             std::sort(renderer->meshes.begin(), renderer->meshes.end(), [](Mesh* a, Mesh* b) {
                 return a->GetMaterial() < b->GetMaterial();
             });
-        // }
+        }
 
-        // for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-        //     Entity* child = ProcessNode(node->mChildren[i], scene, baseDir);
-        //     child->parent = entity;
-        //     entity->children.push_back(child);
-        // }
+        for (unsigned int i = 0; i < node->mNumChildren; ++i) {
+            Entity* child = ProcessNode(node->mChildren[i], scene, baseDir);
+            child->parent = entity;
+            entity->children.push_back(child);
+        }
 
         return entity;
-    }
-
-    void Model::ProcessChildren(aiNode* parent, const aiScene* scene, const std::filesystem::path& baseDir, MeshRenderer* renderer) {
-        for (unsigned int i = 0; i < parent->mNumMeshes; ++i) {
-            aiMesh* mesh = scene->mMeshes[parent->mMeshes[i]];
-
-            renderer->meshes.push_back(ProcessMesh(mesh));
-            renderer->meshes.back()->SetMaterial(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
-            // renderer->materials.push_back(LoadMaterial(scene->mMaterials[mesh->mMaterialIndex], baseDir));
-        }
-        for (unsigned int i = 0; i < parent->mNumChildren; ++i) {
-            ProcessChildren(parent->mChildren[i], scene, baseDir, renderer);
-        }
     }
 
     Mesh* Model::ProcessMesh(aiMesh* mesh) {
@@ -119,19 +112,52 @@ namespace Engine {
 
         Material* material = new Material(matName, shader);
 
-        for (size_t i = 0; i < aiMat->GetTextureCount(aiTextureType_DIFFUSE); i++) {
-            aiString texPath;
-            aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
+        // PBR texture loading
+        aiString texPath;
+        if (aiMat->GetTexture(aiTextureType_BASE_COLOR, 0, &texPath) == AI_SUCCESS) {
             std::string fullPath = (baseDir / texPath.C_Str()).string();
-            material->AddTexture("u_DiffuseTexture" + std::to_string(i + 1), AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
+            material->AddTexture("u_AlbedoMap", AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
+        } else if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+            std::string fullPath = (baseDir / texPath.C_Str()).string();
+            material->AddTexture("u_AlbedoMap", AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
         }
 
-        for (size_t i = 0; i < aiMat->GetTextureCount(aiTextureType_SPECULAR); i++) {
-            aiString texPath;
-            aiMat->GetTexture(aiTextureType_SPECULAR, 0, &texPath);
+        if (aiMat->GetTexture(aiTextureType_NORMALS, 0, &texPath) == AI_SUCCESS) {
             std::string fullPath = (baseDir / texPath.C_Str()).string();
-            material->AddTexture("u_SpecularTexture" + std::to_string(i + 1), AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
+            material->AddTexture("u_NormalMap", AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
         }
+
+        if (aiMat->GetTexture(aiTextureType_METALNESS, 0, &texPath) == AI_SUCCESS) {
+            std::string fullPath = (baseDir / texPath.C_Str()).string();
+            material->AddTexture("u_MetallicMap", AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
+        }
+
+        if (aiMat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texPath) == AI_SUCCESS) {
+            std::string fullPath = (baseDir / texPath.C_Str()).string();
+            material->AddTexture("u_RoughnessMap", AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
+        }
+
+        if (aiMat->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texPath) == AI_SUCCESS) {
+            std::string fullPath = (baseDir / texPath.C_Str()).string();
+            material->AddTexture("u_AoMap", AssetManager::LoadNTexture(texPath.C_Str(), fullPath));
+        }
+
+        aiColor3D color(0.f, 0.f, 0.f);
+        if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+            material->albedo = glm::vec3(color.r, color.g, color.b);
+        }
+
+        float metallic = 0.01f;
+        if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS) {
+            material->metallic = metallic;
+        }
+
+        float roughness = 0.8f;
+        if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS) {
+            material->roughness = roughness;
+        }
+
+        material->ao = 0.5f;
 
         AssetManager::AddMaterial(matName, material);
         return matName;

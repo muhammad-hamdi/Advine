@@ -77,30 +77,24 @@ namespace Engine {
     void NRenderer::SubmitMesh(const Mesh &mesh, Material &material, const glm::mat4 &transform)
     {
         GPUHandle shader = material.GetShaderHandle();
-        static GPUHandle boundShader = 0;
-        if (boundShader != shader) {
-            api->BindShader(shader);
-            api->SetUniformInt(shader, "u_ShadowMap", 0);
-            boundShader = shader;
-        }
+        api->BindShader(shader);
 
+        api->SetUniformInt(shader, "u_ShadowMap", 0);
+        api->BindTexture2D(0, 0); // Explicitly unbind texture unit 0
 
         // Bind the textures
-        if (boundMaterial != &material) {
-            api->SetUniformInt(shader, "u_IsLit", material.isLit);
-
-            static GPUHandle boundTextures[32] = {};
-            int slot = 1;
-            for (auto& [name, texture] : material.GetTextures()) {
-                if (boundTextures[slot] != texture->handle) {
-                    api->BindTexture2D(texture->handle, slot);
-                    boundTextures[slot] = texture->handle;
-                }
-                api->SetUniformInt(shader, name, slot++);
-            }
-
-            boundMaterial = &material;
+        int slot = 1;
+        for (auto& [name, texture] : material.GetTextures()) {
+            api->BindTexture2D(texture->handle, slot);
+            api->SetUniformInt(shader, name, slot++);
+            api->SetUniformInt(shader, "u_Has" + name.substr(2), 1);
         }
+
+        // PBR material properties
+        api->SetUniformVec3(shader, "u_Material.albedo", glm::value_ptr(material.albedo));
+        api->SetUniformFloat(shader, "u_Material.metallic", material.metallic);
+        api->SetUniformFloat(shader, "u_Material.roughness", material.roughness);
+        api->SetUniformFloat(shader, "u_Material.ao", material.ao);
 
         // TODO: move transformation matrices to UBO
         // api->UpdateUniformBuffer(material.GetTransformUBO(), &transform, sizeof(glm::mat4));
@@ -119,10 +113,10 @@ namespace Engine {
         api->DrawIndexed(mesh.GetIndexCount());
 
         // Cleanup
-        // slot = 1;
-        // for (auto& [name, texture] : material.GetTextures()) {
-        //     api->BindTexture2D(0, slot++);
-        //     api->SetUniformInt(shader, name, -1);
-        // }
+        slot = 1;
+        for (auto& [name, texture] : material.GetTextures()) {
+            api->BindTexture2D(0, slot++);
+            api->SetUniformInt(shader, name, -1);
+        }
     }
 }

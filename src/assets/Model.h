@@ -23,7 +23,7 @@ namespace Engine {
 
         Entity* ProcessNode(aiNode* node, const aiScene* scene, const std::filesystem::path& baseDir);
 
-        void ProcessChildren(aiNode *parent, const aiScene *scene, const std::filesystem::path &baseDir, MeshRenderer *renderer);
+
 
         Mesh* ProcessMesh(aiMesh* mesh);
 

@@ -25,7 +25,10 @@ namespace Engine
     private:
         std::shared_ptr<RenderAPI> api;
         CameraData mCurrentCamera;
-        Material* boundMaterial;
+
+        GPUHandle boundShader = 0;
+        Material* boundMaterial = nullptr;
+        GPUHandle boundTextures[32] = {};
     public:
         NRenderer();
         NRenderer(RenderBackend backend);
