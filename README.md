@@ -1,6 +1,6 @@
 # AdventureEngine
 
-AdventureEngine is a WIP C++ game engine for my personal use in game development.
+A C++ game engine with an OpenGL renderer, shadow mapping, Blinn-Phong lighting, component-based scene graph, and ImGui editor. Built as the foundation for a Sonic Adventure remake.
 
 ---
 <img width="1280" height="676" alt="preview" src="https://github.com/user-attachments/assets/dbeb1d8a-68f7-46bd-bb1b-3ade98d94a70" />
