@@ -3,6 +3,7 @@
 AdventureEngine is a WIP C++ game engine for my personal use in game development.
 
 ---
+<img width="1280" height="676" alt="preview" src="https://github.com/user-attachments/assets/dbeb1d8a-68f7-46bd-bb1b-3ade98d94a70" />
 
 ## Features
 
